@@ -34,13 +34,17 @@ em { font-family: 'Playfair Display', serif; font-weight: 500; }
 .brand em { font-size: 18px; }
 .brand-mark { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--coral); color: white; }
 .brand-mark svg { width: 19px; }
-nav { display: flex; align-items: center; gap: clamp(13px, 1.8vw, 28px); font-size: 12px; font-weight: 500; }
+nav { display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 500; }
 nav a { text-decoration: none; }
 nav a:not(.nav-cta), .nav-link-button { font-style: italic; }
-nav a:not(.nav-cta):hover, .nav-link-button:hover { color: var(--coral); }
+nav a:not(.nav-cta), .nav-link-button {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 14px;
+  border: 1px solid rgba(41,54,46,.28); border-radius: 999px; background: rgba(255,255,255,.52);
+}
+nav a:not(.nav-cta):hover, .nav-link-button:hover { color: var(--coral); border-color: var(--coral); background: white; }
 nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-underline-offset: 5px; }
-.nav-home-group { display: flex; align-items: center; gap: 22px; padding: 10px 17px; border: 1px solid rgba(41,54,46,.18); border-radius: 999px; background: rgba(255,255,255,.5); }
-.nav-link-button { border: 0; background: transparent; padding: 0; cursor: pointer; font-size: inherit; font-weight: inherit; }
+.nav-home-group { display: flex; align-items: center; gap: 12px; }
+.nav-link-button { cursor: pointer; font-size: inherit; font-weight: inherit; }
 .nav-cta { display: inline-flex; align-items: center; gap: 14px; border: 1px solid var(--ink); border-radius: 999px; padding: 10px 16px; }
 .nav-cta:hover { background: var(--ink); color: white; }
 .menu-button { display: none; background: none; border: 0; }
@@ -325,7 +329,8 @@ footer { background: #202c24; color: white; padding: 70px clamp(25px, 7vw, 110px
   .menu-button { display: block; cursor: pointer; }
   nav { display: none; position: absolute; top: 78px; left: 0; right: 0; background: #f8f5ed; padding: 25px; flex-direction: column; box-shadow: 0 20px 30px rgba(0,0,0,.1); }
   nav.open { display: flex; }
-  .nav-home-group { width: min(100%, 360px); flex-direction: column; gap: 16px; border-radius: 18px; padding: 18px; }
+  .nav-home-group { width: min(100%, 360px); flex-direction: column; gap: 12px; }
+  .nav-home-group a, .nav-home-group button, nav > a { min-width: 190px; }
 }
 
 @media (max-width: 850px) {

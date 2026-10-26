@@ -24,6 +24,41 @@ import './App.css'
 
 const COLORS = ['#29362e', '#e77560', '#e7a6c4', '#e7a833', '#6f8f78', '#7694b7', '#ffffff']
 
+const VOLUNTEER_PAGES = [
+  {
+    tab: 'Awareness fair',
+    kicker: 'Community visibility',
+    title: 'Bay Area Awareness Fair',
+    description: 'A concept page for sharing an accessible community event with art stations, disability education, and conversations led by people with lived experience.',
+    details: ['Public education', 'Creative activities', 'Local partnerships'],
+    art: 'fair',
+  },
+  {
+    tab: 'Art drive',
+    kicker: 'Creative exchange',
+    title: 'Community Art Supply Drive',
+    description: 'A sample recap for collecting new, accessible art materials and preparing creative kits for partner programs and local events.',
+    details: ['Supply collection', 'Volunteer packing', 'Partner delivery'],
+    art: 'garden',
+  },
+  {
+    tab: 'Fundraiser',
+    kicker: 'Community powered',
+    title: 'Neighborhood Fundraiser',
+    description: 'A template for documenting the goal, community partners, amount raised, transparent allocation, and lessons from a local fundraiser.',
+    details: ['Fundraising goal', 'Impact breakdown', 'Thank-you notes'],
+    art: 'fields',
+  },
+  {
+    tab: 'Service trip',
+    kicker: 'Volunteer field notes',
+    title: 'Taiwan Service Week',
+    description: 'A place for approved reflections, activity highlights, and practical advice from volunteers after an in-person service program.',
+    details: ['Daily reflections', 'Consent-approved photos', 'What we learned'],
+    art: 'journey',
+  },
+] as const
+
 function DrawingStudio({ onClose }: { onClose: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawing = useRef(false)
@@ -148,6 +183,7 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [messageSent, setMessageSent] = useState(false)
   const [applicationSent, setApplicationSent] = useState(false)
+  const [volunteerPage, setVolunteerPage] = useState(0)
   const requestedPage = new URLSearchParams(window.location.search).get('page')
   const page = requestedPage === 'updates' || requestedPage === 'volunteer' ? requestedPage : 'home'
 
@@ -346,47 +382,91 @@ function App() {
         <section className="volunteer-section" id="volunteers">
           <div className="volunteer-heading">
             <span className="eyebrow">The volunteer journal</span>
-            <h2>Show up. Learn.<br /><em>Share it forward.</em></h2>
-            <p>Volunteers will be able to document approved fundraising events and service projects so new members can see how Azalea turns ideas into action.</p>
+            <h2>Open our<br /><em>sketchbook.</em></h2>
+            <p>Browse sample activity pages, then flip to the final bookmark when you’re ready to imagine your place on the team.</p>
           </div>
-          <div className="field-notes">
-            <article>
-              <span className="note-tag">Event story template</span>
-              <div className="event-art pink"><span>PAST<br />EVENT</span></div>
-              <h3>Community fundraiser</h3>
-              <p>A future volunteer post can recap the goal, what happened, funds raised, and lessons learned.</p>
-            </article>
-            <article>
-              <span className="note-tag">Service story template</span>
-              <div className="event-art green"><Flower2 /></div>
-              <h3>Volunteer field note</h3>
-              <p>Teams can share consent-approved reflections and practical advice for future volunteers.</p>
-            </article>
-          </div>
-          <div className="application-card" id="volunteer-application">
-            {applicationSent ? (
-              <div className="application-success">
-                <span><Check /></span>
-                <div><h3>Thanks for raising your hand.</h3><p>This prototype has not sent your information. The secure application workflow will be connected before launch.</p></div>
-                <button className="text-button" onClick={() => setApplicationSent(false)}>Return to form</button>
+          <div className="sketchbook" id="volunteer-application">
+            <div className="bookmarks" role="tablist" aria-label="Volunteer sketchbook pages">
+              {VOLUNTEER_PAGES.map((item, index) => (
+                <button
+                  key={item.tab}
+                  role="tab"
+                  aria-selected={volunteerPage === index}
+                  onClick={() => setVolunteerPage(index)}
+                >
+                  <span>0{index + 1}</span>{item.tab}
+                </button>
+              ))}
+              <button
+                className="join-bookmark"
+                role="tab"
+                aria-selected={volunteerPage === VOLUNTEER_PAGES.length}
+                onClick={() => setVolunteerPage(VOLUNTEER_PAGES.length)}
+              >
+                <span>05</span>Join the team
+              </button>
+            </div>
+            <div className="book-cover">
+              <div className="book-spine"><Flower2 /><span>AZALEA<br />FIELD NOTES</span></div>
+              <div className="book-paper-edge"></div>
+              <div className="book-spread" key={volunteerPage}>
+                {volunteerPage < VOLUNTEER_PAGES.length ? (
+                  <>
+                    <article className="sketch-page story-page">
+                      <span className="page-number">0{volunteerPage + 1}</span>
+                      <span className="hand-label">{VOLUNTEER_PAGES[volunteerPage].kicker}</span>
+                      <h3>{VOLUNTEER_PAGES[volunteerPage].title}</h3>
+                      <p>{VOLUNTEER_PAGES[volunteerPage].description}</p>
+                      <ul>
+                        {VOLUNTEER_PAGES[volunteerPage].details.map((detail) => <li key={detail}>{detail}</li>)}
+                      </ul>
+                      <small>Concept activity page • replace with verified event details</small>
+                    </article>
+                    <div className={`sketch-page illustrated-page ${VOLUNTEER_PAGES[volunteerPage].art}`} aria-hidden="true">
+                      <div className="page-tape"></div>
+                      <div className="activity-illustration">
+                        <span className="shape s1"></span><span className="shape s2"></span><span className="shape s3"></span>
+                        <Flower2 />
+                      </div>
+                      <p>make • learn • connect</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <article className="sketch-page join-page">
+                      <span className="page-number">05</span>
+                      <span className="hand-label">Join the team</span>
+                      <h3>Become an Azalea volunteer.</h3>
+                      <p>Tell us a little about yourself and how you’d like to contribute. Students under 18 will need parent or guardian approval before participating.</p>
+                      <div className="join-doodle" aria-hidden="true"><Flower2 /><span>you could be<br />on this page!</span></div>
+                    </article>
+                    <div className="sketch-page application-page">
+                      {applicationSent ? (
+                        <div className="application-success">
+                          <span><Check /></span>
+                          <div><h3>Thanks for raising your hand.</h3><p>This prototype has not sent your information. The secure application workflow will be connected before launch.</p></div>
+                          <button className="text-button" onClick={() => setApplicationSent(false)}>Return to form</button>
+                        </div>
+                      ) : (
+                        <form onSubmit={(event) => { event.preventDefault(); setApplicationSent(true) }}>
+                          <label>First name<input required name="firstName" autoComplete="given-name" /></label>
+                          <label>Email<input required type="email" name="email" autoComplete="email" /></label>
+                          <label>Current stage<select required name="stage" defaultValue=""><option value="" disabled>Select one</option><option>High school student</option><option>College student</option><option>Community member</option></select></label>
+                          <label>How would you like to help?<select required name="interest" defaultValue=""><option value="" disabled>Select one</option><option>Fundraising events</option><option>Art and messages</option><option>Community outreach</option><option>Translation</option><option>Website and media</option></select></label>
+                          <label className="wide">Why are you interested?<textarea required name="motivation" maxLength={600} /></label>
+                          <button className="button primary" type="submit">Start my application <ArrowRight size={17} /></button>
+                        </form>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
-            ) : (
-              <>
-                <div className="application-intro">
-                  <span className="eyebrow">Join the team</span>
-                  <h3>Become an Azalea volunteer.</h3>
-                  <p>Tell us a little about yourself and how you’d like to contribute. Students under 18 will need parent or guardian approval before participating.</p>
-                </div>
-                <form onSubmit={(event) => { event.preventDefault(); setApplicationSent(true) }}>
-                  <label>First name<input required name="firstName" autoComplete="given-name" /></label>
-                  <label>Email<input required type="email" name="email" autoComplete="email" /></label>
-                  <label>Current stage<select required name="stage" defaultValue=""><option value="" disabled>Select one</option><option>High school student</option><option>College student</option><option>Community member</option></select></label>
-                  <label>How would you like to help?<select required name="interest" defaultValue=""><option value="" disabled>Select one</option><option>Fundraising events</option><option>Art and messages</option><option>Community outreach</option><option>Translation</option><option>Website and media</option></select></label>
-                  <label className="wide">Why are you interested?<textarea required name="motivation" maxLength={600} /></label>
-                  <button className="button primary" type="submit">Start my application <ArrowRight size={17} /></button>
-                </form>
-              </>
-            )}
+            </div>
+            <div className="book-controls">
+              <button disabled={volunteerPage === 0} onClick={() => setVolunteerPage((page) => Math.max(0, page - 1))}>← Previous page</button>
+              <span>{volunteerPage + 1} / {VOLUNTEER_PAGES.length + 1}</span>
+              <button disabled={volunteerPage === VOLUNTEER_PAGES.length} onClick={() => setVolunteerPage((page) => Math.min(VOLUNTEER_PAGES.length, page + 1))}>Next page →</button>
+            </div>
           </div>
         </section>
 

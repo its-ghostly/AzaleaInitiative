@@ -142,8 +142,8 @@ Raffles and donation-linked prize drawings can be regulated gambling, especially
   - Community guidelines and reporting
 - Volunteer
   - Separate top-level page accessed from the main navigation
-  - Previous fundraising and service field notes
-  - New volunteer application
+  - Interactive bookmarked sketchbook for fundraising and service field notes
+  - Final “Join the team” bookmark containing the volunteer application
   - Parent or guardian approval for minors
 - Support
   - Current mission campaign and budget
@@ -165,6 +165,8 @@ The design uses a warm editorial style rather than a medical or institutional lo
 - Postcards, stamps, flowers, and hand-drawn marks: connection across distance
 
 Small homages to the original Azalea Initiative site remain in the new system: blush-pink accents, a short pink headline rule, italic navigation, thin editorial borders, and cropped azalea blossoms at the edge of the hero. These cues preserve continuity without reproducing the original layout.
+
+The Volunteer page uses a separate tactile visual language: a teal field notebook with a visible cover edge, square rounded dotted pages, colorful activity bookmarks, and a restrained page-turn transition. This makes prior activities feel collected over time while keeping the application as the intentional final page.
 
 ## 8. Technical plan
 

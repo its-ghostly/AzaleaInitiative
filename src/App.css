@@ -184,23 +184,72 @@ nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-un
 
 .volunteer-section { background: var(--blush); padding: 115px clamp(25px, 7vw, 110px); }
 .volunteer-heading { max-width: 740px; }
-.field-notes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 1200px; margin: 65px auto 30px; }
-.field-notes article { position: relative; background: white; border: 1px solid #252e28; padding: 15px 15px 28px; }
-.note-tag { position: absolute; top: 25px; left: 25px; z-index: 2; background: white; border: 1px solid #252e28; padding: 7px 9px; font-size: 8px; text-transform: uppercase; letter-spacing: .1em; }
-.event-art { height: 255px; display: grid; place-items: center; }
-.event-art.pink { background: #e7a6c4; color: #fff7fa; font-size: 39px; line-height: .83; font-weight: 600; text-align: center; letter-spacing: -.05em; }
-.event-art.green { background: #77907c; color: #f4ccdc; }.event-art.green svg { width: 90px; height: 90px; stroke-width: 1; }
-.field-notes h3 { font-family: 'Playfair Display'; font-style: italic; font-size: 23px; margin: 22px 8px 8px; }.field-notes p { color: #747b75; font-size: 11px; line-height: 1.6; margin: 0 8px; }
-.application-card { max-width: 1200px; margin: 0 auto; background: #fffdf8; border: 1px solid #252e28; padding: 48px; display: grid; grid-template-columns: .68fr 1.32fr; gap: 65px; }
-.application-intro h3 { font-family: 'Playfair Display'; font-style: italic; font-size: 31px; margin: 13px 0 12px; }.application-intro p { color: #737a74; font-size: 12px; line-height: 1.65; }
-.application-card form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-.application-card label { display: flex; flex-direction: column; gap: 7px; font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: #626a64; }
-.application-card input, .application-card select, .application-card textarea { border: 0; border-bottom: 1px solid #a8aaa5; border-radius: 0; background: transparent; padding: 9px 2px; outline: none; color: var(--ink); min-width: 0; }
-.application-card input:focus, .application-card select:focus, .application-card textarea:focus { border-color: var(--coral); }
-.application-card textarea { resize: vertical; min-height: 70px; }.application-card .wide { grid-column: 1 / -1; }.application-card form .button { justify-self: start; }
-.application-success { grid-column: 1 / -1; min-height: 210px; display: flex; gap: 25px; align-items: center; justify-content: center; }
+.sketchbook { max-width: 1160px; margin: 65px auto 0; }
+.bookmarks { display: flex; align-items: flex-end; gap: 6px; padding-left: 95px; overflow-x: auto; scrollbar-width: thin; }
+.bookmarks button {
+  min-width: 128px; border: 0; border-radius: 12px 12px 0 0; padding: 13px 15px 11px; background: #9bcf87;
+  color: #173d38; cursor: pointer; font-size: 10px; font-weight: 600; text-align: left; transition: padding .2s ease, background .2s ease;
+}
+.bookmarks button:nth-child(2) { background: #f08ca5; }.bookmarks button:nth-child(3) { background: #d8ec52; }.bookmarks button:nth-child(4) { background: #75baca; }
+.bookmarks button.join-bookmark { background: #f6b4ca; min-width: 150px; }
+.bookmarks button span { display: block; font-size: 8px; opacity: .62; margin-bottom: 3px; }
+.bookmarks button[aria-selected='true'] { background: #087e71; color: white; padding-top: 19px; }
+.book-cover {
+  position: relative; padding: 22px 22px 22px 78px; border: 5px solid #055d57; border-radius: 24px;
+  background: #087e71; box-shadow: 0 20px 45px rgba(25,71,63,.22); overflow-x: auto; scrollbar-width: thin;
+}
+.book-spine {
+  position: absolute; inset: 18px auto 18px 18px; width: 43px; border-radius: 13px; background: #075e58; color: #cce64f;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 19px 8px; z-index: 3;
+}
+.book-spine svg { width: 22px; }.book-spine span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9px; line-height: 1.2; letter-spacing: .11em; }
+.book-paper-edge { position: absolute; inset: 30px 14px 13px 67px; border-radius: 14px; background: repeating-linear-gradient(0deg, #cabfae 0 1px, #f5ecdc 1px 3px); }
+.book-spread {
+  min-width: 800px; position: relative; z-index: 2; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  perspective: 1600px; filter: drop-shadow(0 8px 10px rgba(31,58,51,.17)); animation: pageFlip .55s ease both;
+}
+@keyframes pageFlip {
+  from { opacity: .35; transform: rotateY(-8deg) translateX(-10px); }
+  to { opacity: 1; transform: rotateY(0) translateX(0); }
+}
+.sketch-page {
+  aspect-ratio: 1; min-height: 0; position: relative; padding: clamp(28px, 4vw, 55px);
+  background-color: #fffdf3; background-image: radial-gradient(#c9c2aa 1px, transparent 1px); background-size: 15px 15px;
+  border: 1px solid #b7ad9b; overflow: hidden;
+}
+.sketch-page:first-child { border-radius: 16px 3px 3px 16px; border-right-color: #a69b88; box-shadow: inset -16px 0 24px rgba(92,78,60,.07); }
+.sketch-page:last-child { border-radius: 3px 16px 16px 3px; border-left-color: #d9d0bf; box-shadow: inset 16px 0 24px rgba(92,78,60,.06); }
+.page-number { position: absolute; right: 28px; top: 25px; width: 34px; height: 34px; border: 1px solid #2c594f; border-radius: 50%; display: grid; place-items: center; font-size: 9px; }
+.story-page .hand-label, .join-page .hand-label { display: inline-block; margin-top: 18px; }
+.story-page h3, .join-page h3 { max-width: 330px; font-size: clamp(31px, 3.1vw, 48px); line-height: 1.02; letter-spacing: -.05em; margin: 17px 0 22px; }
+.story-page > p, .join-page > p { color: #687168; max-width: 370px; font-size: 12px; line-height: 1.72; }
+.story-page ul { list-style: none; margin: 30px 0 0; padding: 0; border-top: 1px solid #91a098; }
+.story-page li { padding: 10px 0; border-bottom: 1px solid #abb6af; font-size: 9px; text-transform: uppercase; letter-spacing: .1em; }
+.story-page small { position: absolute; left: 55px; bottom: 32px; color: #95978f; font-size: 8px; }
+.illustrated-page { display: flex; flex-direction: column; justify-content: flex-end; }
+.page-tape { position: absolute; top: 18px; left: calc(50% - 44px); width: 88px; height: 25px; background: rgba(248,235,180,.77); transform: rotate(2deg); z-index: 3; }
+.activity-illustration { position: absolute; inset: 34px; border-radius: 10px; overflow: hidden; background: #0b7a6e; }
+.activity-illustration > svg { position: absolute; right: 14%; bottom: 13%; width: 100px; height: 100px; color: white; stroke-width: 1; z-index: 2; }
+.activity-illustration .shape { position: absolute; border-radius: 50%; }
+.activity-illustration .s1 { width: 75%; height: 65%; left: -16%; bottom: -10%; background: #28b66c; }
+.activity-illustration .s2 { width: 55%; height: 55%; right: -12%; top: -6%; background: #d5ec45; }
+.activity-illustration .s3 { width: 35%; height: 35%; left: 30%; top: 28%; background: #0a655d; }
+.illustrated-page.garden .activity-illustration { background: #f8f4e9; }.illustrated-page.garden .activity-illustration .s1 { background: #77a47b; }.illustrated-page.garden .activity-illustration .s2 { background: #f36f8d; }.illustrated-page.garden .activity-illustration .s3 { background: #f5b5c7; }
+.illustrated-page.fields .activity-illustration { background: repeating-linear-gradient(0deg, #2c7db0 0 4px, #b9e35e 4px 8px); }.illustrated-page.fields .activity-illustration .s1 { background: rgba(255,255,255,.75); width: 18%; height: 140%; left: 42%; bottom: -20%; border-radius: 0; transform: rotate(38deg); }.illustrated-page.fields .activity-illustration .s2, .illustrated-page.fields .activity-illustration .s3 { display: none; }
+.illustrated-page.journey .activity-illustration { background: #0b756b; }.illustrated-page.journey .activity-illustration .s1 { background: #f097aa; }.illustrated-page.journey .activity-illustration .s2 { background: #d8eb4a; }.illustrated-page.journey .activity-illustration .s3 { background: #86c6b2; }
+.illustrated-page > p { position: relative; z-index: 4; align-self: center; margin: 0; padding: 7px 12px; background: #fffdf3; font-family: 'Playfair Display'; font-style: italic; transform: rotate(-2deg); }
+.join-page { background-color: #e8f0ce; }.join-doodle { margin-top: 40px; display: flex; gap: 16px; align-items: center; color: #087e71; font-family: 'Playfair Display'; font-style: italic; }.join-doodle svg { width: 48px; height: 48px; }
+.application-page { display: grid; place-items: center; }
+.application-page form { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 17px; }
+.application-page label { display: flex; flex-direction: column; gap: 6px; font-size: 8px; text-transform: uppercase; letter-spacing: .1em; color: #526158; }
+.application-page input, .application-page select, .application-page textarea { border: 0; border-bottom: 1px solid #8c9a90; border-radius: 0; background: rgba(255,253,243,.66); padding: 8px 2px; outline: none; color: var(--ink); min-width: 0; }
+.application-page input:focus, .application-page select:focus, .application-page textarea:focus { border-color: var(--coral); }
+.application-page textarea { resize: vertical; min-height: 58px; }.application-page .wide { grid-column: 1 / -1; }.application-page form .button { justify-self: start; }
+.application-success { min-height: 210px; display: flex; gap: 25px; align-items: center; justify-content: center; }
 .application-success > span { width: 55px; height: 55px; flex: 0 0 auto; border-radius: 50%; display: grid; place-items: center; background: #77907c; color: white; }
 .application-success h3 { font-family: 'Playfair Display'; font-style: italic; font-size: 28px; margin: 0 0 7px; }.application-success p { color: #737a74; font-size: 12px; max-width: 490px; margin: 0; }
+.book-controls { display: flex; justify-content: center; align-items: center; gap: 24px; margin-top: 18px; font-size: 10px; }
+.book-controls button { border: 0; background: none; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }.book-controls button:disabled { opacity: .35; cursor: default; }
 
 .guidelines-section { background: #202c24; color: white; padding: 85px clamp(25px, 7vw, 110px); display: grid; grid-template-columns: .65fr 1.35fr; gap: 9vw; border-top: 1px solid #617566; }
 .guidelines-section > div:first-child > svg { color: var(--azalea); margin-bottom: 20px; }.guidelines-section h2 { font-size: clamp(36px, 3.8vw, 57px); line-height: 1.05; margin: 16px 0 0; }
@@ -294,7 +343,9 @@ footer { background: #202c24; color: white; padding: 70px clamp(25px, 7vw, 110px
   .updates-section, .guidelines-section { grid-template-columns: 1fr; padding: 80px 22px; }
   .update-feed { grid-template-columns: 1fr; }.update-post { border-right: 0; border-bottom: 1px solid #839086; }
   .volunteer-section { padding: 80px 22px; }
-  .application-card { grid-template-columns: 1fr; gap: 35px; padding: 36px 28px; }
+  .bookmarks { padding-left: 62px; }
+  .book-cover { padding-left: 65px; }
+  .story-page h3, .join-page h3 { font-size: 34px; }
   .bulletin-board { min-height: 0; padding: 42px 32px; }
   .donation-section { padding: 80px 22px; }
   .giving-grid { grid-template-columns: 1fr; }
@@ -309,8 +360,14 @@ footer { background: #202c24; color: white; padding: 70px clamp(25px, 7vw, 110px
   .hero-art { min-height: 500px; }
   .statement h2, .section-heading h2, .message-copy h2, .gallery-section h2, .updates-heading h2, .volunteer-heading h2, .mission-intro h2, .donation-heading h2 { font-size: 40px; }
   .form-footer > span { display: none; }
-  .field-notes { grid-template-columns: 1fr; }
-  .application-card form { grid-template-columns: 1fr; }.application-card .wide { grid-column: auto; }
+  .sketchbook { margin-inline: -10px; }
+  .bookmarks { padding-left: 48px; }.bookmarks button { min-width: 108px; padding-inline: 11px; }
+  .book-cover { padding: 15px 15px 15px 56px; border-width: 4px; border-radius: 18px; }
+  .book-spine { width: 34px; inset: 12px auto 12px 10px; padding-inline: 5px; }
+  .book-paper-edge { inset: 23px 8px 8px 49px; }
+  .book-spread { min-width: 680px; }
+  .sketch-page { padding: 34px; }.story-page small { left: 34px; }
+  .application-page form { gap: 13px; }
   .application-success { flex-direction: column; text-align: center; }
   .route { flex-wrap: wrap; }.route > div { min-width: 45px; }
   .bulletin-board { grid-template-columns: 1fr; padding: 38px 20px; border-width: 9px; }

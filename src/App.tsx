@@ -148,22 +148,24 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [messageSent, setMessageSent] = useState(false)
   const [applicationSent, setApplicationSent] = useState(false)
+  const requestedPage = new URLSearchParams(window.location.search).get('page')
+  const page = requestedPage === 'updates' || requestedPage === 'volunteer' ? requestedPage : 'home'
 
   return (
-    <>
+    <div className={`site-shell page-${page}`}>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Azalea Initiative home">
+        <a className="brand" href="./" aria-label="Azalea Initiative home">
           <span className="brand-mark"><Flower2 /></span>
           <span>Azalea <em>Initiative</em></span>
         </a>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"><Menu /></button>
         <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)}>
-          <a href="#mission">Our mission</a>
+          <a href="./#mission">Our mission</a>
           <button className="nav-link-button" onClick={() => setStudioOpen(true)}>Send a Picture!</button>
-          <a href="#updates">Updates</a>
-          <a href="#volunteers">Volunteer</a>
-          <a href="#current-mission">Current Mission</a>
-          <a className="nav-cta" href="#donate">Donate to the Cause <ArrowRight size={16} /></a>
+          <a href="?page=updates#updates" aria-current={page === 'updates' ? 'page' : undefined}>Updates</a>
+          <a href="?page=volunteer#volunteers" aria-current={page === 'volunteer' ? 'page' : undefined}>Volunteer</a>
+          <a href="./#current-mission">Current Mission</a>
+          <a className="nav-cta" href="./#donate">Donate to the Cause <ArrowRight size={16} /></a>
         </nav>
       </header>
 
@@ -467,17 +469,17 @@ function App() {
 
       <footer>
         <div className="footer-brand">
-          <a className="brand" href="#top"><span className="brand-mark"><Flower2 /></span><span>Azalea <em>Initiative</em></span></a>
+          <a className="brand" href="./"><span className="brand-mark"><Flower2 /></span><span>Azalea <em>Initiative</em></span></a>
           <p>Young people growing a more understanding world.</p>
         </div>
         <div className="footer-links">
-          <div><strong>Explore</strong><a href="#mission">Our mission</a><a href="#updates">Caretaker updates</a><a href="#current-mission">Current mission</a></div>
-          <div><strong>Get involved</strong><button onClick={() => setStudioOpen(true)}>Create art</button><a href="#volunteer-application">Apply to volunteer</a><a href="#donate">Donate to the cause</a></div>
+          <div><strong>Explore</strong><a href="./#mission">Our mission</a><a href="?page=updates#updates">Caretaker updates</a><a href="./#current-mission">Current mission</a></div>
+          <div><strong>Get involved</strong><button onClick={() => setStudioOpen(true)}>Create art</button><a href="?page=volunteer#volunteer-application">Apply to volunteer</a><a href="./#donate">Donate to the cause</a></div>
         </div>
         <div className="footer-bottom"><span>© 2026 Azalea Initiative</span><span>Made with care in the Bay Area</span></div>
       </footer>
       {studioOpen && <DrawingStudio onClose={() => setStudioOpen(false)} />}
-    </>
+    </div>
   )
 }
 

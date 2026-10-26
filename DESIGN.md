@@ -136,10 +136,12 @@ Raffles and donation-linked prize drawings can be regulated gambling, especially
   - Public, permissioned artwork
   - Shared garden
 - Updates
+  - Separate top-level page accessed from the main navigation
   - Consent-approved caretaker posts
   - Facility activity and artwork updates
   - Community guidelines and reporting
 - Volunteer
+  - Separate top-level page accessed from the main navigation
   - Previous fundraising and service field notes
   - New volunteer application
   - Parent or guardian approval for minors

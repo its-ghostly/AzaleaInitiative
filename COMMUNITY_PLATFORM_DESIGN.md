@@ -84,7 +84,7 @@ Every response should include:
 
 ### Caretaker updates
 
-Caretakers receive a facility-scoped updates workspace for posting consent-approved activity notes, celebrations, new artwork announcements, and messages from participants.
+Caretaker updates live on a separate top-level public page linked directly from the main navigation. Caretakers receive a facility-scoped workspace for posting consent-approved activity notes, celebrations, new artwork announcements, and messages from participants.
 
 - Updates use the same consent, translation, accessibility, and moderation process as artwork.
 - A post can contain approved artwork or activity media, but never private medical or contact information.
@@ -94,7 +94,7 @@ Caretakers receive a facility-scoped updates workspace for posting consent-appro
 
 ### Volunteer field notes and applications
 
-Volunteers receive a separate area for documenting previous fundraising events and service projects.
+Volunteers receive a separate top-level page linked directly from the main navigation for documenting previous fundraising events and service projects and applying to join the organization.
 
 - Posts should state the event’s goal, activities, funds raised when verified, fund allocation, and lessons learned.
 - Every photo or participant story requires appropriate permission.

@@ -196,12 +196,14 @@ function App() {
         </a>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"><Menu /></button>
         <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)}>
-          <a href="./#mission">Our mission</a>
-          <button className="nav-link-button" onClick={() => setStudioOpen(true)}>Send a Picture!</button>
+          <div className="nav-home-group" aria-label="Homepage sections">
+            <a href="./#mission">Our mission</a>
+            <button className="nav-link-button" onClick={() => setStudioOpen(true)}>Send a Picture!</button>
+            <a href="./#current-mission">Current Mission</a>
+          </div>
+          <a className="nav-cta" href="./#donate">Donate to the Cause <ArrowRight size={16} /></a>
           <a href="?page=updates#updates" aria-current={page === 'updates' ? 'page' : undefined}>Updates</a>
           <a href="?page=volunteer#volunteers" aria-current={page === 'volunteer' ? 'page' : undefined}>Volunteer</a>
-          <a href="./#current-mission">Current Mission</a>
-          <a className="nav-cta" href="./#donate">Donate to the Cause <ArrowRight size={16} /></a>
         </nav>
       </header>
 

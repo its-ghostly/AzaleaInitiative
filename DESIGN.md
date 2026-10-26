@@ -32,7 +32,10 @@ Build understanding and genuine human connection across age, ability, and distan
 - Browser-based drawing studio with colors, eraser, clear, and local download
 - Caregiver thank-you message form interaction
 - Consent-first gallery concept with clearly marked sample artwork
+- Caretaker updates area with a visible community-rules summary
+- Volunteer field-note templates and prototype application form
 - Winter service-trip campaign section
+- Separate year-round donation section
 - Mobile navigation and accessibility foundations
 
 ### Needed before public launch
@@ -86,6 +89,11 @@ Avoid:
 
 ## 5. Fundraising approach
 
+The website separates giving into two clear paths:
+
+- **Current Mission:** a scrapbook-style campaign board for the active winter service trip, including its destination, purpose, costs, progress, and updates.
+- **Donate to the Cause:** year-round general support for aligned charities, disability-visibility events, volunteer programs, art materials, translation, and outreach.
+
 ### Recommended first step
 
 Until Azalea Initiative is incorporated or fiscally sponsored, use a reputable hosted campaign platform. The campaign must state whether gifts are tax-deductible. Do not imply nonprofit status before it exists.
@@ -127,10 +135,20 @@ Raffles and donation-linked prize drawings can be regulated gambling, especially
 - Gallery
   - Public, permissioned artwork
   - Shared garden
+- Updates
+  - Consent-approved caretaker posts
+  - Facility activity and artwork updates
+  - Community guidelines and reporting
+- Volunteer
+  - Previous fundraising and service field notes
+  - New volunteer application
+  - Parent or guardian approval for minors
 - Support
-  - Campaign and budget
-  - Volunteer interest form
+  - Current mission campaign and budget
+  - Year-round general fund
   - Sponsor contact
+
+The caretaker workspace, volunteer publishing permissions, community enforcement model, and phased implementation plan are detailed in `COMMUNITY_PLATFORM_DESIGN.md`.
 
 ## 7. Visual direction
 
@@ -143,6 +161,8 @@ The design uses a warm editorial style rather than a medical or institutional lo
 - Display serif italics: handmade, personal voice
 - Plain sans serif: clear interfaces and readable body copy
 - Postcards, stamps, flowers, and hand-drawn marks: connection across distance
+
+Small homages to the original Azalea Initiative site remain in the new system: blush-pink accents, a short pink headline rule, italic navigation, thin editorial borders, and cropped azalea blossoms at the edge of the hero. These cues preserve continuity without reproducing the original layout.
 
 ## 8. Technical plan
 

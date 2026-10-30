@@ -10,6 +10,28 @@ import type {
 
 const TOKEN_KEY = 'azalea-session-token'
 
+/** API origin for GitHub Pages / static hosts. Empty = same origin (local + tunnel). */
+function apiBase() {
+  const fromEnv = String(import.meta.env.VITE_API_BASE || '').replace(/\/$/, '')
+  if (fromEnv) return fromEnv
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
+    // Fallback when Pages was built without VITE_API_BASE
+    return 'https://experiencing-islands-logan-june.trycloudflare.com'
+  }
+  return ''
+}
+
+function apiUrl(path: string) {
+  if (/^https?:\/\//i.test(path)) return path
+  return `${apiBase()}${path.startsWith('/') ? path : `/${path}`}`
+}
+
+/** Resolve stored media paths (e.g. /api/media/…) for display on another origin. */
+export function resolveMediaUrl(url: string) {
+  if (!url || url.startsWith('data:') || /^https?:\/\//i.test(url)) return url
+  return apiUrl(url)
+}
+
 export type VolunteerApplication = {
   id: string
   createdAt: string
@@ -80,19 +102,29 @@ async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (token) headers.set('Authorization', `Bearer ${token}`)
   let response: Response
   try {
-    response = await fetch(path, { ...init, headers })
+    response = await fetch(apiUrl(path), { ...init, headers })
   } catch {
     throw new Error('Could not reach the Azalea server. Make sure the site is running, then try again.')
   }
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
+    if (response.status === 405) {
+      throw new Error('This copy of the site cannot save drawings (static hosting). Open the live Azalea server link, then try again.')
+    }
     throw new Error((data as { error?: string }).error || `Request failed (${response.status})`)
   }
   return data as T
 }
 
 export function normalizeSubmission(item: Submission): Submission {
-  return { ...item, replies: item.replies ?? [] }
+  return {
+    ...item,
+    imageDataUrl: resolveMediaUrl(item.imageDataUrl || ''),
+    replies: (item.replies ?? []).map((reply) => ({
+      ...reply,
+      imageDataUrl: reply.imageDataUrl ? resolveMediaUrl(reply.imageDataUrl) : reply.imageDataUrl,
+    })),
+  }
 }
 
 export async function bootstrapStore() {

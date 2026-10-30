@@ -1,221 +1,188 @@
-import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ArrowDown,
   ArrowRight,
   Brush,
   CalendarDays,
   Check,
-  Download,
-  Eraser,
   Flower2,
   HandHeart,
   Heart,
   Mail,
-  MapPin,
   Megaphone,
   Menu,
-  Plane,
   ShieldCheck,
   Sparkles,
   Users,
-  X,
 } from 'lucide-react'
 import './App.css'
+import CommunityAccount from './components/CommunityAccount'
+import DrawingStudio from './components/DrawingStudio'
+import StaffWorkspace from './components/StaffWorkspace'
+import StatusTracker from './components/StatusTracker'
+import { LanguageSwitch, useLanguage } from './i18n/LanguageContext'
+import { displaySenderName, submitVolunteerApplication } from './platform/store'
+import { usePlatform } from './platform/usePlatform'
 
-const COLORS = ['#29362e', '#e77560', '#e7a6c4', '#e7a833', '#6f8f78', '#7694b7', '#ffffff']
+type VolunteerPage = {
+  tab: string
+  kicker: string
+  title: string
+  description: string
+  details: string[]
+  art: string
+  articleUrl?: string
+  articleSource?: string
+  image?: string
+  caption?: string
+}
 
-const VOLUNTEER_PAGES = [
+const VOLUNTEER_PAGES: VolunteerPage[] = [
   {
-    tab: 'Awareness fair',
-    kicker: 'Community visibility',
-    title: 'Bay Area Awareness Fair',
-    description: 'A concept page for sharing an accessible community event with art stations, disability education, and conversations led by people with lived experience.',
-    details: ['Public education', 'Creative activities', 'Local partnerships'],
-    art: 'fair',
+    tab: 'Why we volunteer',
+    kicker: 'Our shared purpose',
+    title: 'Show up with care.',
+    description: 'Azalea volunteers help Bay Area neighbors and partner caretakers in Taiwan feel connected—through art, presence, and small acts of kindness. We center dignity, listen first, and treat every exchange as mutual, never charity.',
+    details: [
+      'Build real relationships across ability and distance',
+      'Support caretakers and participants with respect',
+      'Make kindness visible through art and service',
+    ],
+    art: 'logo',
+    image: '/brand/azalea-logo.svg',
+    caption: 'Azalea Initiative',
   },
   {
-    tab: 'Art drive',
-    kicker: 'Creative exchange',
-    title: 'Community Art Supply Drive',
-    description: 'A sample recap for collecting new, accessible art materials and preparing creative kits for partner programs and local events.',
-    details: ['Supply collection', 'Volunteer packing', 'Partner delivery'],
+    tab: 'Summer camp',
+    kicker: 'July 21–23, 2025 · Vista, CA',
+    title: 'Together We Shine',
+    description:
+      'An inclusive overnight camp at Sunset Paradise themed “Together We Shine” / “Our Camp Story”—celebrating individuality and teamwork. We fostered empathy through cooperative play, kept calm sensory spaces and predictable routines, and made room for creativity, movement, and self-expression. CPR training was included for the team.',
+    details: [
+      'Drop-off July 21, 5–6pm · Pick-up July 23, 10:30am',
+      'Welcome circles, art, cooking, talent show & farewell mural',
+      'Quiet zones, visual schedules, choice boards & peer buddies',
+      'Counselors: Mrs Ann, Beverly, Mona, Celine, Fred, Jessie · Campers: Trent, Leah, Hannah, Roy',
+    ],
     art: 'garden',
+    image: '/press/together-we-shine.jpg',
+    caption: 'Together We Shine — campers and counselors at Sunset Paradise, Vista.',
   },
   {
-    tab: 'Fundraiser',
-    kicker: 'Community powered',
-    title: 'Neighborhood Fundraiser',
-    description: 'A template for documenting the goal, community partners, amount raised, transparent allocation, and lessons from a local fundraiser.',
-    details: ['Fundraising goal', 'Impact breakdown', 'Thank-you notes'],
-    art: 'fields',
+    tab: 'Press story',
+    kicker: 'In the news · July 2025',
+    title: 'Glamping dreams by the sea',
+    description: 'Nine U.S. student volunteers partnered with Xiangyuan Memorial Home for a two-day glamping trip at Xiang Hai Na Yang in Taichung—many residents’ first overnight camping adventure under the stars, with games, hot pot, and care that needed no shared language.',
+    details: ['Xiangyuan partnership', 'First-time camping trip', 'Student-led service'],
+    art: 'press',
+    articleUrl: 'https://hoomedia.com.tw/2025/07/02/76051/',
+    articleSource: '互傳媒 Hoo Media',
+    image: '/press/hoomedia-camping.jpg',
+    caption: 'International volunteers and Xiangyuan residents on their dream camping trip.',
   },
-  {
-    tab: 'Service trip',
-    kicker: 'Volunteer field notes',
-    title: 'Taiwan Service Week',
-    description: 'A place for approved reflections, activity highlights, and practical advice from volunteers after an in-person service program.',
-    details: ['Daily reflections', 'Consent-approved photos', 'What we learned'],
-    art: 'journey',
-  },
-] as const
+]
 
-function DrawingStudio({ onClose }: { onClose: () => void }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const drawing = useRef(false)
-  const lastPoint = useRef({ x: 0, y: 0 })
-  const [color, setColor] = useState(COLORS[0])
-  const [sent, setSent] = useState(false)
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const context = canvas.getContext('2d')
-    if (!context) return
-    context.fillStyle = '#fffdf7'
-    context.fillRect(0, 0, canvas.width, canvas.height)
-  }, [])
+const CONNECT_PAGES = ['draw', 'thank', 'view'] as const
+type SitePage = 'home' | 'draw' | 'thank' | 'view' | 'updates' | 'volunteer' | 'staff' | 'status'
 
-  const point = (event: PointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current!
-    const rect = canvas.getBoundingClientRect()
-    return {
-      x: (event.clientX - rect.left) * (canvas.width / rect.width),
-      y: (event.clientY - rect.top) * (canvas.height / rect.height),
-    }
+function resolvePage(): SitePage {
+  const requested = new URLSearchParams(window.location.search).get('page')
+  if (
+    requested === 'draw'
+    || requested === 'thank'
+    || requested === 'view'
+    || requested === 'updates'
+    || requested === 'volunteer'
+    || requested === 'staff'
+    || requested === 'status'
+  ) {
+    return requested
   }
-
-  const startDrawing = (event: PointerEvent<HTMLCanvasElement>) => {
-    drawing.current = true
-    lastPoint.current = point(event)
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-
-  const draw = (event: PointerEvent<HTMLCanvasElement>) => {
-    if (!drawing.current) return
-    const canvas = canvasRef.current!
-    const context = canvas.getContext('2d')!
-    const next = point(event)
-    context.beginPath()
-    context.moveTo(lastPoint.current.x, lastPoint.current.y)
-    context.lineTo(next.x, next.y)
-    context.strokeStyle = color
-    context.lineWidth = color === '#ffffff' ? 28 : 7
-    context.lineCap = 'round'
-    context.lineJoin = 'round'
-    context.stroke()
-    lastPoint.current = next
-  }
-
-  const clear = () => {
-    const canvas = canvasRef.current!
-    const context = canvas.getContext('2d')!
-    context.fillStyle = '#fffdf7'
-    context.fillRect(0, 0, canvas.width, canvas.height)
-  }
-
-  const download = () => {
-    const link = document.createElement('a')
-    link.download = 'azalea-artwork.png'
-    link.href = canvasRef.current!.toDataURL()
-    link.click()
-  }
-
-  return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="studio-title">
-      <div className="studio">
-        <div className="studio-header">
-          <div>
-            <span className="eyebrow">A small act of joy</span>
-            <h2 id="studio-title">Create something kind</h2>
-          </div>
-          <button className="icon-button" onClick={onClose} aria-label="Close drawing studio"><X /></button>
-        </div>
-        {sent ? (
-          <div className="success-state">
-            <span className="success-icon"><Check /></span>
-            <h3>Your artwork is ready for its journey.</h3>
-            <p>In the full program, a volunteer will review it before securely sharing it with our partner facility.</p>
-            <button className="button primary" onClick={onClose}>Back to the garden</button>
-          </div>
-        ) : (
-          <>
-            <canvas
-              ref={canvasRef}
-              width={900}
-              height={520}
-              onPointerDown={startDrawing}
-              onPointerMove={draw}
-              onPointerUp={() => { drawing.current = false }}
-              onPointerCancel={() => { drawing.current = false }}
-              aria-label="Drawing canvas"
-            />
-            <div className="studio-toolbar">
-              <div className="colors" aria-label="Drawing colors">
-                {COLORS.slice(0, -1).map((item) => (
-                  <button
-                    key={item}
-                    className={`color-swatch ${color === item ? 'active' : ''}`}
-                    style={{ backgroundColor: item }}
-                    onClick={() => setColor(item)}
-                    aria-label={`Select color ${item}`}
-                  />
-                ))}
-                <button className={`eraser ${color === '#ffffff' ? 'active' : ''}`} onClick={() => setColor('#ffffff')} aria-label="Eraser">
-                  <Eraser size={18} />
-                </button>
-                <button className="text-button" onClick={clear}>Clear</button>
-              </div>
-              <div className="toolbar-actions">
-                <button className="button ghost small" onClick={download}><Download size={17} /> Save</button>
-                <button className="button primary small" onClick={() => setSent(true)}>Share kindness <ArrowRight size={17} /></button>
-              </div>
-            </div>
-            <p className="privacy-note">Prototype only — artwork stays on your device unless you download it.</p>
-          </>
-        )}
-      </div>
-    </div>
-  )
+  return 'home'
 }
 
 function App() {
-  const [studioOpen, setStudioOpen] = useState(false)
+  const { t } = useLanguage()
+  const { submissions } = usePlatform()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [sendOpen, setSendOpen] = useState(false)
   const [messageSent, setMessageSent] = useState(false)
   const [applicationSent, setApplicationSent] = useState(false)
   const [volunteerPage, setVolunteerPage] = useState(0)
-  const requestedPage = new URLSearchParams(window.location.search).get('page')
-  const page = requestedPage === 'updates' || requestedPage === 'volunteer' ? requestedPage : 'home'
+  const [flipDir, setFlipDir] = useState<'forward' | 'back'>('forward')
+  const page = resolvePage()
+  const sendActive = CONNECT_PAGES.includes(page as typeof CONNECT_PAGES[number])
+  const gardenArt = submissions
+    .filter((item) => item.status !== 'rejected' && Boolean(item.imageDataUrl))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const gardenMats = ['staff-art-sun', 'staff-art-sky', 'staff-art-bloom'] as const
+
+  useEffect(() => {
+    if (!sendOpen) return
+    const close = () => setSendOpen(false)
+    window.addEventListener('click', close)
+    return () => window.removeEventListener('click', close)
+  }, [sendOpen])
+
+  const turnVolunteerPage = (next: number) => {
+    setFlipDir(next > volunteerPage ? 'forward' : 'back')
+    setVolunteerPage(next)
+  }
 
   return (
     <div className={`site-shell page-${page}`}>
       <header className="site-header">
-        <a className="brand" href="./" aria-label="Azalea Initiative home">
-          <span className="brand-mark"><Flower2 /></span>
-          <span>Azalea <em>Initiative</em></span>
-        </a>
+        <div className="header-left">
+          <LanguageSwitch />
+          <CommunityAccount />
+          <a className="brand" href="./" aria-label="Azalea Initiative home">
+            <span className="brand-mark"><Flower2 /></span>
+            <span>Azalea <em>Initiative</em></span>
+          </a>
+        </div>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"><Menu /></button>
         <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)}>
           <div className="nav-home-group" aria-label="Homepage sections">
-            <a href="./#mission">Our mission</a>
-            <button className="nav-link-button" onClick={() => setStudioOpen(true)}>Send a Picture!</button>
-            <a href="./#current-mission">Current Mission</a>
+            <a href="./#mission">{t('nav.mission')}</a>
+            <div
+              className={`nav-dropdown${sendOpen ? ' open' : ''}${sendActive ? ' active' : ''}`}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="nav-link-button nav-dropdown-toggle"
+                aria-expanded={sendOpen}
+                aria-haspopup="menu"
+                onClick={() => setSendOpen((open) => !open)}
+              >
+                {t('nav.send')} <span className="nav-caret" aria-hidden="true" />
+              </button>
+              <div className="nav-dropdown-menu" role="menu" hidden={!sendOpen}>
+                <a role="menuitem" href="?page=draw" aria-current={page === 'draw' ? 'page' : undefined}>{t('nav.draw')}</a>
+                <a role="menuitem" href="?page=thank" aria-current={page === 'thank' ? 'page' : undefined}>{t('nav.thank')}</a>
+                <a role="menuitem" href="?page=view" aria-current={page === 'view' ? 'page' : undefined}>{t('nav.view')}</a>
+              </div>
+            </div>
+            <a href="./#current-mission">{t('nav.current')}</a>
+            <a className="nav-cta" href="./#donate">{t('nav.donate')} <ArrowRight size={16} /></a>
           </div>
-          <a className="nav-cta" href="./#donate">Donate to the Cause <ArrowRight size={16} /></a>
-          <a href="?page=updates#updates" aria-current={page === 'updates' ? 'page' : undefined}>Updates</a>
-          <a href="?page=volunteer#volunteers" aria-current={page === 'volunteer' ? 'page' : undefined}>Volunteer</a>
+          <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
+          <a href="?page=volunteer" aria-current={page === 'volunteer' ? 'page' : undefined}>{t('nav.volunteer')}</a>
+          <a href="?page=status" aria-current={page === 'status' ? 'page' : undefined}>{t('nav.track')}</a>
+          <a href="?page=staff" aria-current={page === 'staff' ? 'page' : undefined}>{t('nav.staff')}</a>
         </nav>
       </header>
 
       <main id="top">
         <section className="hero-section">
           <div className="hero-copy">
-            <span className="eyebrow"><Sparkles size={14} /> Kindness across the Globe</span>
-            <h1>Every person<br />deserves to feel<br /><em>seen.</em></h1>
-            <p>We’re a student-led community connecting Bay Area neighbors with people with disabilities and their caregivers in Taiwan—one drawing, message, and shared moment at a time.</p>
+            <span className="eyebrow"><Sparkles size={14} /> {t('hero.eyebrow')}</span>
+            <h1 dangerouslySetInnerHTML={{ __html: t('hero.title') }} />
+            <p>{t('hero.body')}</p>
             <div className="hero-actions">
-              <button className="button primary" onClick={() => setStudioOpen(true)}>Create a drawing <Brush size={18} /></button>
-              <a className="button text-link" href="#mission">Discover our story <ArrowDown size={18} /></a>
+              <a className="button primary" href="?page=draw">{t('hero.ctaDraw')} <Brush size={18} /></a>
+              <a className="button text-link" href="#mission">{t('hero.ctaMission')} <ArrowDown size={18} /></a>
             </div>
           </div>
           <div className="hero-art" aria-hidden="true">
@@ -248,6 +215,7 @@ function App() {
         <section className="statement" id="mission">
           <span className="eyebrow centered">What we believe</span>
           <h2>Disability is part of the human story.<br /><em>Connection should be, too.</em></h2>
+          <a className="button primary statement-cta" href="?page=draw">Send a drawing <Brush size={18} /></a>
           <p>We create accessible ways for young people and local communities to learn, volunteer, and build genuine relationships across age, ability, and distance.</p>
           <div className="values">
             <article>
@@ -271,13 +239,17 @@ function App() {
           </div>
         </section>
 
+        <section className="draw-section" id="draw">
+          <DrawingStudio embedded onClose={() => { window.location.href = './' }} />
+        </section>
+
         <section className="connect-section" id="connect">
           <div className="section-heading">
             <span className="eyebrow">Choose your way to connect</span>
             <h2>Send a little warmth<br /><em>across the world.</em></h2>
           </div>
           <div className="connection-grid">
-            <button className="connection-card coral" onClick={() => setStudioOpen(true)}>
+            <a className="connection-card coral" href="?page=draw">
               <span className="card-number">01</span>
               <span className="card-icon"><Brush /></span>
               <span>
@@ -285,8 +257,8 @@ function App() {
                 <small>Create art to color, display, and enjoy.</small>
               </span>
               <ArrowRight className="card-arrow" />
-            </button>
-            <a className="connection-card blue" href="#message">
+            </a>
+            <a className="connection-card blue" href="?page=thank">
               <span className="card-number">02</span>
               <span className="card-icon"><Mail /></span>
               <span>
@@ -295,7 +267,7 @@ function App() {
               </span>
               <ArrowRight className="card-arrow" />
             </a>
-            <a className="connection-card gold" href="#gallery">
+            <a className="connection-card gold" href="?page=view">
               <span className="card-number">03</span>
               <span className="card-icon"><Sparkles /></span>
               <span>
@@ -342,46 +314,66 @@ function App() {
               <span className="eyebrow">The shared garden</span>
               <h2>Art that belongs<br /><em>to everyone.</em></h2>
             </div>
-            <p>A future consent-first gallery where every creation becomes a digital flower—never ranked, sold, or reduced to a prize.</p>
+            <p>Drawings shared by our community bloom here—never ranked, sold, or reduced to a prize. Visit and contribute to help the garden grow.</p>
           </div>
-          <div className="gallery-row" aria-label="Sample artwork placeholders">
-            <article className="art-card art-one"><div><span>✿</span><span>☀</span></div><p>Sunshine Garden</p><small>Community artwork • sample</small></article>
-            <article className="art-card art-two"><div><span>魚</span><span>〰</span></div><p>Blue Fish Day</p><small>Community artwork • sample</small></article>
-            <article className="art-card art-three"><div><span>⌂</span><span>♡</span></div><p>Home Together</p><small>Community artwork • sample</small></article>
-          </div>
-          <p className="gallery-caption"><Sparkles size={15} /> Collect kindness, not rarity. Visit and contribute to help the community garden grow.</p>
+          {gardenArt.length === 0 ? (
+            <p className="staff-gallery-empty">The garden is still waiting. Create a drawing to plant the first flower.</p>
+          ) : (
+            <div className="gallery-row staff-gallery-row" aria-label="Community artwork gallery">
+              {gardenArt.map((item, index) => (
+                <article key={item.id} className={`art-card ${gardenMats[index % gardenMats.length]}`}>
+                  <div className="staff-art-frame">
+                    <img src={item.imageDataUrl} alt="" />
+                  </div>
+                  <p>{displaySenderName(item.senderName, t('sender.anonymous'))}</p>
+                  <small>{item.note?.trim() || new Date(item.createdAt).toLocaleDateString()}</small>
+                </article>
+              ))}
+            </div>
+          )}
+          <p className="gallery-caption"><Sparkles size={15} /> Art that belongs to everyone.</p>
         </section>
 
         <section className="updates-section" id="updates">
-          <div className="updates-heading">
-            <span className="eyebrow">From our partner caretakers</span>
-            <h2>Notes from<br /><em>day to day.</em></h2>
-            <p>A future space for trained facility caretakers to share consent-approved activities, celebrations, and community updates directly with supporters.</p>
-            <button className="button ghost" onClick={() => alert('The invitation-only caretaker workspace will be added with the moderated community platform.')}>Caretaker workspace coming soon <ArrowRight size={17} /></button>
-          </div>
-          <div className="update-feed">
-            <article className="update-post">
-              <div className="update-meta"><span>Sample update</span><time><CalendarDays size={14} /> Activity journal</time></div>
-              <h3>A creative afternoon together</h3>
-              <p>Caretakers will be able to post approved photos of artwork, activity recaps, and messages from participating artists—without exposing private health or contact information.</p>
-              <div className="update-placeholder"><Flower2 /><span>Consent-approved media</span></div>
-            </article>
-            <aside className="community-promise">
-              <span><ShieldCheck /></span>
-              <p className="eyebrow">Our community promise</p>
-              <h3>Kind, safe, and person-first.</h3>
-              <ul>
-                <li>Get permission before sharing someone’s story.</li>
-                <li>Encourage—never pity, diagnose, or criticize.</li>
-                <li>Keep contact details and private information private.</li>
-                <li>Credit artists and respect their remix choices.</li>
-              </ul>
-              <a href="#community-guidelines">Read the full guidelines <ArrowRight size={15} /></a>
-            </aside>
+          <div className="chalkboard" aria-label="Caretaker updates chalkboard">
+            <div className="chalk-rail" aria-hidden="true"></div>
+            <div className="updates-heading">
+              <span className="eyebrow chalk-eyebrow">From our partner caretakers</span>
+              <h2>Notes from<br /><em>day to day.</em></h2>
+              <p>Trained facility caretakers will share consent-approved activities, celebrations, and community notes here—clear, kind, and person-first.</p>
+              <button className="button chalk-button" onClick={() => alert('The invitation-only caretaker workspace will be added with the moderated community platform.')}>Caretaker workspace coming soon <ArrowRight size={17} /></button>
+            </div>
+            <div className="update-feed">
+              <article className="update-post">
+                <div className="update-meta"><span>Sample update</span><time><CalendarDays size={14} /> Activity journal</time></div>
+                <h3>A creative afternoon together</h3>
+                <p>Caretakers will be able to post approved photos of artwork, activity recaps, and messages from participating artists—without exposing private health or contact information.</p>
+                <div className="update-placeholder"><Flower2 /><span>Consent-approved media</span></div>
+              </article>
+              <aside className="community-promise">
+                <span><ShieldCheck /></span>
+                <p className="eyebrow chalk-eyebrow">Our community promise</p>
+                <h3>Kind, safe, and person-first.</h3>
+                <ul>
+                  <li>Get permission before sharing someone’s story.</li>
+                  <li>Encourage—never pity, diagnose, or criticize.</li>
+                  <li>Keep contact details and private information private.</li>
+                  <li>Credit artists and respect their remix choices.</li>
+                </ul>
+                <a href="#community-guidelines">Read the full guidelines <ArrowRight size={15} /></a>
+              </aside>
+            </div>
+            <div className="chalk-ledge" aria-hidden="true"><span></span><span></span><span></span></div>
           </div>
         </section>
 
         <section className="volunteer-section" id="volunteers">
+          <div className="volunteer-florals" aria-hidden="true">
+            <img className="floral top-left" src="/florals/azalea-top-left.png" alt="" />
+            <img className="floral top-right" src="/florals/azalea-top-right.png?v=2" alt="" />
+            <img className="floral bottom-left" src="/florals/azalea-bottom-left.png" alt="" />
+            <img className="floral bottom-right" src="/florals/azalea-bottom-right.png" alt="" />
+          </div>
           <div className="volunteer-heading">
             <span className="eyebrow">The volunteer journal</span>
             <h2>Open our<br /><em>sketchbook.</em></h2>
@@ -394,7 +386,7 @@ function App() {
                   key={item.tab}
                   role="tab"
                   aria-selected={volunteerPage === index}
-                  onClick={() => setVolunteerPage(index)}
+                  onClick={() => turnVolunteerPage(index)}
                 >
                   <span>0{index + 1}</span>{item.tab}
                 </button>
@@ -403,7 +395,7 @@ function App() {
                 className="join-bookmark"
                 role="tab"
                 aria-selected={volunteerPage === VOLUNTEER_PAGES.length}
-                onClick={() => setVolunteerPage(VOLUNTEER_PAGES.length)}
+                onClick={() => turnVolunteerPage(VOLUNTEER_PAGES.length)}
               >
                 <span>05</span>Join the team
               </button>
@@ -411,46 +403,103 @@ function App() {
             <div className="book-cover">
               <div className="book-spine"><Flower2 /><span>AZALEA<br />FIELD NOTES</span></div>
               <div className="book-paper-edge"></div>
-              <div className="book-spread" key={volunteerPage}>
+              <div className={`book-spread turning-${flipDir}`} key={volunteerPage}>
                 {volunteerPage < VOLUNTEER_PAGES.length ? (
                   <>
                     <article className="sketch-page story-page">
                       <span className="page-number">0{volunteerPage + 1}</span>
-                      <span className="hand-label">{VOLUNTEER_PAGES[volunteerPage].kicker}</span>
-                      <h3>{VOLUNTEER_PAGES[volunteerPage].title}</h3>
-                      <p>{VOLUNTEER_PAGES[volunteerPage].description}</p>
-                      <ul>
-                        {VOLUNTEER_PAGES[volunteerPage].details.map((detail) => <li key={detail}>{detail}</li>)}
-                      </ul>
-                      <small>Concept activity page • replace with verified event details</small>
-                    </article>
-                    <div className={`sketch-page illustrated-page ${VOLUNTEER_PAGES[volunteerPage].art}`} aria-hidden="true">
-                      <div className="page-tape"></div>
-                      <div className="activity-illustration">
-                        <span className="shape s1"></span><span className="shape s2"></span><span className="shape s3"></span>
-                        <Flower2 />
+                      <div className="story-page-body">
+                        <span className="hand-label">{VOLUNTEER_PAGES[volunteerPage].kicker}</span>
+                        <h3>{VOLUNTEER_PAGES[volunteerPage].title}</h3>
+                        <p>{VOLUNTEER_PAGES[volunteerPage].description}</p>
+                        <ul>
+                          {VOLUNTEER_PAGES[volunteerPage].details.map((detail) => <li key={detail}>{detail}</li>)}
+                        </ul>
+                        {VOLUNTEER_PAGES[volunteerPage].articleUrl ? (
+                          <a className="press-link" href={VOLUNTEER_PAGES[volunteerPage].articleUrl} target="_blank" rel="noreferrer">
+                            Read the full story on {VOLUNTEER_PAGES[volunteerPage].articleSource} <ArrowRight size={15} />
+                          </a>
+                        ) : null}
+                        <small>
+                          {VOLUNTEER_PAGES[volunteerPage].art === 'logo'
+                            ? 'Our mark · Azalea Initiative'
+                            : VOLUNTEER_PAGES[volunteerPage].image
+                              ? 'From our field notes'
+                              : 'Field note from our volunteer journal'}
+                        </small>
                       </div>
-                      <p>make • learn • connect</p>
-                    </div>
+                    </article>
+                    {VOLUNTEER_PAGES[volunteerPage].art === 'logo' && VOLUNTEER_PAGES[volunteerPage].image ? (
+                      <div className="sketch-page logo-page">
+                        <img
+                          className="logo-direct"
+                          src={VOLUNTEER_PAGES[volunteerPage].image}
+                          alt={VOLUNTEER_PAGES[volunteerPage].caption || 'Azalea Initiative logo'}
+                        />
+                      </div>
+                    ) : VOLUNTEER_PAGES[volunteerPage].image ? (
+                      <div className={`sketch-page illustrated-page press-page${VOLUNTEER_PAGES[volunteerPage].art === 'press' ? '' : ' photo-page'}`}>
+                        <div className="page-tape"></div>
+                        <figure className="press-clipping">
+                          <img src={VOLUNTEER_PAGES[volunteerPage].image} alt={VOLUNTEER_PAGES[volunteerPage].caption || VOLUNTEER_PAGES[volunteerPage].title} />
+                          <figcaption>
+                            <span>{VOLUNTEER_PAGES[volunteerPage].art === 'press' ? '互傳媒 · July 2, 2025' : 'Our volunteers'}</span>
+                            {VOLUNTEER_PAGES[volunteerPage].caption}
+                          </figcaption>
+                        </figure>
+                      </div>
+                    ) : (
+                      <div className={`sketch-page illustrated-page ${VOLUNTEER_PAGES[volunteerPage].art}`} aria-hidden="true">
+                        <div className="page-tape"></div>
+                        <div className="activity-illustration">
+                          <span className="shape s1"></span><span className="shape s2"></span><span className="shape s3"></span>
+                          <Flower2 />
+                        </div>
+                        <p>make • learn • connect</p>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>
                     <article className="sketch-page join-page">
-                      <span className="page-number">05</span>
+                      <span className="page-number">0{VOLUNTEER_PAGES.length + 1}</span>
                       <span className="hand-label">Join the team</span>
                       <h3>Become an Azalea volunteer.</h3>
-                      <p>Tell us a little about yourself and how you’d like to contribute. Students under 18 will need parent or guardian approval before participating.</p>
+                      <p>Tell us a little about yourself and how you’d like to contribute. Students under 18 will need parent or guardian approval before participating. Applications are saved for Azalea staff and opened as an email to {`celine.zhang@aloft9.com`}.</p>
                       <div className="join-doodle" aria-hidden="true"><Flower2 /><span>you could be<br />on this page!</span></div>
                     </article>
                     <div className="sketch-page application-page">
                       {applicationSent ? (
                         <div className="application-success">
                           <span><Check /></span>
-                          <div><h3>Thanks for raising your hand.</h3><p>This prototype has not sent your information. The secure application workflow will be connected before launch.</p></div>
+                          <div>
+                            <h3>Thanks for raising your hand.</h3>
+                            <p>Your application was saved for Azalea staff. If your email app opened, please send that message to finish notifying the team.</p>
+                          </div>
                           <button className="text-button" onClick={() => setApplicationSent(false)}>Return to form</button>
                         </div>
                       ) : (
-                        <form onSubmit={(event) => { event.preventDefault(); setApplicationSent(true) }}>
+                        <form
+                          onSubmit={async (event) => {
+                            event.preventDefault()
+                            const form = event.currentTarget
+                            const data = new FormData(form)
+                            try {
+                              const result = await submitVolunteerApplication({
+                                firstName: String(data.get('firstName') || ''),
+                                email: String(data.get('email') || ''),
+                                stage: String(data.get('stage') || ''),
+                                interest: String(data.get('interest') || ''),
+                                motivation: String(data.get('motivation') || ''),
+                              })
+                              setApplicationSent(true)
+                              form.reset()
+                              window.open(result.mailto, '_self')
+                            } catch (error) {
+                              alert(error instanceof Error ? error.message : 'Could not submit your application. Please try again.')
+                            }
+                          }}
+                        >
                           <label>First name<input required name="firstName" autoComplete="given-name" /></label>
                           <label>Email<input required type="email" name="email" autoComplete="email" /></label>
                           <label>Current stage<select required name="stage" defaultValue=""><option value="" disabled>Select one</option><option>High school student</option><option>College student</option><option>Community member</option></select></label>
@@ -465,9 +514,9 @@ function App() {
               </div>
             </div>
             <div className="book-controls">
-              <button disabled={volunteerPage === 0} onClick={() => setVolunteerPage((page) => Math.max(0, page - 1))}>← Previous page</button>
+              <button disabled={volunteerPage === 0} onClick={() => turnVolunteerPage(Math.max(0, volunteerPage - 1))}>← Previous page</button>
               <span>{volunteerPage + 1} / {VOLUNTEER_PAGES.length + 1}</span>
-              <button disabled={volunteerPage === VOLUNTEER_PAGES.length} onClick={() => setVolunteerPage((page) => Math.min(VOLUNTEER_PAGES.length, page + 1))}>Next page →</button>
+              <button disabled={volunteerPage === VOLUNTEER_PAGES.length} onClick={() => turnVolunteerPage(Math.min(VOLUNTEER_PAGES.length, volunteerPage + 1))}>Next page →</button>
             </div>
           </div>
         </section>
@@ -486,7 +535,7 @@ function App() {
           <div className="mission-intro">
             <span className="eyebrow">Pinned to our board</span>
             <h2>Our current<br /><em>mission.</em></h2>
-            <p>Our focus changes as community needs change. Right now, we’re raising funds to continue a longstanding winter service tradition in Taiwan.</p>
+            <p>We’re preparing a Winter 2026 trip so students can support staff and residents of Hysiang Yuan Disabled Care Facility.</p>
           </div>
           <div className="bulletin-board">
             <span className="pushpin pin-one"></span>
@@ -495,31 +544,23 @@ function App() {
             <span className="tape tape-two"></span>
             <article className="mission-note">
               <span className="hand-label">Winter 2026</span>
-              <h3>Back to Kaohsiung</h3>
-              <p>We hope to return to Christian Mountain Children’s Home to volunteer in person and continue a relationship built over years of service.</p>
-              <div className="route">
-                <span><MapPin size={17} /> Bay Area</span>
-                <div><Plane size={19} /></div>
-                <span><MapPin size={17} /> Kaohsiung</span>
-              </div>
+              <h3>Back to Taiwan!</h3>
             </article>
             <div className="mission-postcard" aria-hidden="true">
               <div className="postcard-sky"><span>✿</span><span>✿</span><span>✿</span></div>
               <p>See you soon, Taiwan!</p>
-              <small>34.99° N → 22.92° N</small>
+              <small>Bay Area → Taiwan</small>
             </div>
             <div className="fund-card">
               <div className="fund-top">
-                <span>Current campaign</span>
-                <strong>Funding page coming soon</strong>
+                <span>Planned campaign goal</span>
+                <strong className="fund-goal">$10,000</strong>
+                <p className="fund-purpose">Travel, lodging, and on-site support for high school volunteers serving with Hysiang Yuan.</p>
               </div>
-              <div className="progress"><span></span></div>
-              <div className="fund-stats">
-                <span><strong>Our goal</strong><small>Travel, lodging & supplies</small></span>
-                <span><strong>100%</strong><small>Transparent updates</small></span>
-              </div>
-              <button className="button cream" onClick={() => alert('A verified campaign link will be added once the fundraising setup is ready.')}>Follow this mission <ArrowRight size={17} /></button>
-              <small className="fund-disclaimer">Campaign donations are not yet being accepted on this prototype.</small>
+              <aside className="fund-status-note" aria-label="Fundraising status">
+                <p className="fund-status-title">Fundraising is not open yet</p>
+                <p>We’re still setting up a verified way to accept gifts. When the campaign launches, a donate button will appear here.</p>
+              </aside>
             </div>
           </div>
         </section>
@@ -528,7 +569,7 @@ function App() {
           <div className="donation-heading">
             <span className="eyebrow">Year-round support</span>
             <h2>Fuel the work<br /><em>between missions.</em></h2>
-            <p>General donations help us support aligned charities, organize disability-visibility events, and give student volunteers the tools to keep showing up.</p>
+            <p>One day, general gifts will help charities, visibility events, and student volunteers keep showing up.</p>
           </div>
           <div className="giving-grid">
             <article><span><HandHeart /></span><h3>Charitable giving</h3><p>Support carefully selected organizations serving people with disabilities.</p></article>
@@ -541,26 +582,37 @@ function App() {
               <h3>Give where it can help most.</h3>
               <p>We’ll publish how funds are allocated and share regular impact updates.</p>
             </div>
-            <div>
-              <button className="button primary" onClick={() => alert('A verified general donation link will be added once the organization’s fiscal setup is ready.')}>Donation page coming soon <ArrowRight size={17} /></button>
-              <small>General donations are not yet being accepted on this prototype.</small>
-            </div>
+            <aside className="fund-status-note" aria-label="Donation status">
+              <p className="fund-status-title">We are not accepting donations right now</p>
+              <p>No payment link is live on this site yet. Please create art, volunteer, or check back when giving opens.</p>
+              <a className="button ghost small" href="?page=draw">Create a drawing instead</a>
+            </aside>
           </div>
         </section>
+        <StatusTracker initialCode={new URLSearchParams(window.location.search).get('code') || ''} />
+        <StaffWorkspace />
+
       </main>
 
       <footer>
         <div className="footer-brand">
           <a className="brand" href="./"><span className="brand-mark"><Flower2 /></span><span>Azalea <em>Initiative</em></span></a>
           <p>Young people growing a more understanding world.</p>
+          <div className="footer-social" aria-label="Instagram">
+            <a href="https://www.instagram.com/theazaleainitiative/" target="_blank" rel="noreferrer">
+              <span className="ig-glyph" aria-hidden="true" /> @theazaleainitiative
+            </a>
+            <a href="https://www.instagram.com/theazaleainitiative.sj/" target="_blank" rel="noreferrer">
+              <span className="ig-glyph" aria-hidden="true" /> @theazaleainitiative.sj
+            </a>
+          </div>
         </div>
         <div className="footer-links">
-          <div><strong>Explore</strong><a href="./#mission">Our mission</a><a href="?page=updates#updates">Caretaker updates</a><a href="./#current-mission">Current mission</a></div>
-          <div><strong>Get involved</strong><button onClick={() => setStudioOpen(true)}>Create art</button><a href="?page=volunteer#volunteer-application">Apply to volunteer</a><a href="./#donate">Donate to the cause</a></div>
+          <div><strong>Explore</strong><a href="./#mission">Our mission</a><a href="?page=updates">Caretaker updates</a><a href="./#current-mission">Current mission</a></div>
+          <div><strong>Get involved</strong><a href="?page=draw">Create art</a><a href="?page=volunteer">Apply to volunteer</a><a href="./#donate">Donate to the cause</a></div>
         </div>
         <div className="footer-bottom"><span>© 2026 Azalea Initiative</span><span>Made with care in the Bay Area</span></div>
       </footer>
-      {studioOpen && <DrawingStudio onClose={() => setStudioOpen(false)} />}
     </div>
   )
 }

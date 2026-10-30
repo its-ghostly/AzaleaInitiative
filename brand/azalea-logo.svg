@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Azalea Initiative">
+  <rect width="240" height="240" rx="28" fill="#f8f5ed"/>
+  <circle cx="120" cy="108" r="54" fill="#e77560"/>
+  <g fill="none" stroke="#fffdf8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 78c8 10 14 20 14 30s-6 20-14 30c-8-10-14-20-14-30s6-20 14-30z"/>
+    <path d="M92 98c14 2 26 8 34 16 8 8 14 20 16 34-14-2-26-8-34-16-8-8-14-20-16-34z"/>
+    <path d="M148 98c-14 2-26 8-34 16-8 8-14 20-16 34 14-2 26-8 34-16 8-8 14-20 16-34z"/>
+    <path d="M100 136c6-12 14-22 26-28 12-6 24-8 38-6-6 12-14 22-26 28-12 6-24 8-38 6z"/>
+    <path d="M140 136c-6-12-14-22-26-28-12-6-24-8-38-6 6 12 14 22 26 28 12 6 24 8 38 6z"/>
+  </g>
+  <circle cx="120" cy="108" r="10" fill="#fffdf8"/>
+  <text x="120" y="196" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#29362e">Azalea</text>
+  <text x="120" y="218" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-style="italic" fill="#c65f77">Initiative</text>
+</svg>

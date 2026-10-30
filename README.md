@@ -2,7 +2,17 @@
 
 Student-led community connecting Bay Area neighbors with people with disabilities and their caregivers in Taiwan—through art, messages, volunteering, and shared care.
 
-**Live site:** [https://ghost-sht.github.io/AzaleaInitiative/](https://ghost-sht.github.io/AzaleaInitiative/)
+**Live site (after Pages is turned on):** [https://ghost-sht.github.io/AzaleaInitiative/](https://ghost-sht.github.io/AzaleaInitiative/)
+
+### Turn on GitHub Pages (one-time)
+
+1. Open [Pages settings](https://github.com/ghost-sht/AzaleaInitiative/settings/pages) while signed in as **ghost-sht**
+2. Under **Build and deployment → Source**, choose **Deploy from a branch**
+3. Branch: **gh-pages** / folder: **/ (root)** → Save
+
+The public site will appear at the link above within a minute or two.
+
+> Note: GitHub Pages hosts the website front-end. Saving drawings, sign-in, and staff tools still need the API server (`npm start` locally, or a host like Railway later).
 
 ## What’s here
 

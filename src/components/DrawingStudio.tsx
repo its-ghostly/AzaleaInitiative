@@ -94,7 +94,8 @@ function DrawingStudio({
   const [senderName, setSenderName] = useState('')
   const [consentGallery, setConsentGallery] = useState(false)
   const [sendOpen, setSendOpen] = useState(false)
-  const [locale, setLocale] = useState<'en' | 'zh'>('en')
+  const { t, lang } = useLanguage()
+  const promptLocale: 'en' | 'zh' = lang === 'en' ? 'en' : 'zh'
   const [promptIndex, setPromptIndex] = useState(0)
   const [step, setStep] = useState<'draw' | 'sent'>('draw')
   const [submitted, setSubmitted] = useState<Submission | null>(null)
@@ -160,7 +161,7 @@ function DrawingStudio({
         JSON.stringify({
           image,
           senderName,
-          locale,
+          locale: promptLocale,
         }),
       )
     } catch {
@@ -168,7 +169,7 @@ function DrawingStudio({
     }
     const user = getSessionUser()
     if (user?.kind === 'community') {
-      void saveCommunityDraft({ image, senderName, locale, consentGallery }).catch(() => undefined)
+      void saveCommunityDraft({ image, senderName, locale: promptLocale, consentGallery }).catch(() => undefined)
     }
   }
 
@@ -190,7 +191,6 @@ function DrawingStudio({
         : null)
       if (!draft) return
       if (draft.senderName) setSenderName(draft.senderName)
-      if (draft.locale) setLocale(draft.locale)
       if ('consentGallery' in draft && typeof draft.consentGallery === 'boolean') {
         setConsentGallery(draft.consentGallery)
       }
@@ -357,7 +357,7 @@ function DrawingStudio({
         imageDataUrl: canvas.toDataURL('image/png'),
         senderName: senderName.trim(),
         note: '',
-        locale,
+        locale: promptLocale,
         ageBand: 'prefer_not',
         guardianEmail: '',
         consentDelivery: true,
@@ -375,25 +375,21 @@ function DrawingStudio({
     }
   }
 
-  const { t } = useLanguage()
   const shellClass = embedded ? 'studio studio-embedded' : 'studio'
-  const prompt = PROMPTS[locale][promptIndex]
+  const prompt = PROMPTS[promptLocale][promptIndex]
 
   return (
     <div className={embedded ? 'draw-studio-shell' : 'modal-backdrop'} role={embedded ? undefined : 'dialog'} aria-modal={embedded ? undefined : true} aria-labelledby="studio-title">
       <div className={shellClass}>
         <div className="studio-header">
           <div>
-            <span className="eyebrow">A small act of joy</span>
-            <h2 id="studio-title">{step === 'sent' ? 'On its way' : 'Create something kind'}</h2>
+            <span className="eyebrow">{t('studio.eyebrow')}</span>
+            <h2 id="studio-title">{step === 'sent' ? t('studio.sentTitle') : t('studio.title')}</h2>
             {step === 'draw' && (
               <p className="studio-prompt">
-                <button type="button" className="locale-toggle" onClick={() => setLocale((value) => (value === 'en' ? 'zh' : 'en'))}>
-                  {locale === 'en' ? 'EN' : '繁'}
-                </button>
                 <em>{prompt}</em>
-                <button type="button" className="prompt-cycle" onClick={nextPrompt} aria-label="Show another drawing prompt">
-                  Another idea
+                <button type="button" className="prompt-cycle" onClick={nextPrompt} aria-label={t('studio.anotherIdea')}>
+                  {t('studio.anotherIdea')}
                 </button>
               </p>
             )}
@@ -404,14 +400,13 @@ function DrawingStudio({
         {step === 'sent' && submitted ? (
           <div className="success-state">
             <span className="success-icon"><Check /></span>
-            <h3 className="handwritten-success">Your kindness is on its way.</h3>
+            <h3 className="handwritten-success">{t('studio.onWay')}</h3>
             <p>
-              Thanks, {displaySenderName(senderName, t('sender.anonymous'))}.{' '}
-              Tracking code <strong>{submitted.trackingCode}</strong> — status: <strong>{submitted.status.replaceAll('_', ' ')}</strong>.
-              An Azalea volunteer will review it before partner caretakers receive it.
+              {t('studio.thanksPrefix')} {displaySenderName(senderName, t('sender.anonymous'))}.{' '}
+              {t('studio.sentBody', { code: submitted.trackingCode, status: submitted.status.replaceAll('_', ' ') })}
             </p>
-            <a className="button primary" href={`?page=status&code=${submitted.trackingCode}`}>Track this drawing</a>
-            <button className="button ghost" onClick={onClose}>Back to the garden</button>
+            <a className="button primary" href={`?page=status&code=${submitted.trackingCode}`}>{t('studio.trackDrawing')}</a>
+            <button className="button ghost" onClick={onClose}>{t('studio.backGarden')}</button>
           </div>
         ) : (
           <>
@@ -444,7 +439,7 @@ function DrawingStudio({
                 </button>
                 <button className="icon-tool" onClick={undo} disabled={!canUndo} aria-label="Undo" title="Undo (Ctrl/Cmd+Z)"><Undo2 size={18} /></button>
                 <button className="icon-tool" onClick={redo} disabled={!canRedo} aria-label="Redo" title="Redo (Ctrl/Cmd+Shift+Z)"><Redo2 size={18} /></button>
-                <button className="text-button" onClick={clear}>Clear</button>
+                <button className="text-button" onClick={clear}>{t('studio.clear')}</button>
               </div>
 
               <div className="stamp-row" aria-label="Stamps">
@@ -461,7 +456,7 @@ function DrawingStudio({
               </div>
 
               <div className="brush-controls" aria-label="Brush size">
-                <span className="brush-label">{stamp ? 'Stamp' : erasing ? 'Eraser' : 'Brush'} {brushSize}px</span>
+                <span className="brush-label">{stamp ? t('studio.stamp') : erasing ? t('studio.eraser') : t('studio.brush')} {brushSize}px</span>
                 <input
                   type="range"
                   min={BRUSH_MIN}
@@ -478,41 +473,41 @@ function DrawingStudio({
 
             <div className="studio-message studio-message-compact">
               <label>
-                Your name <span>(optional)</span>
-                <input value={senderName} onChange={(event) => setSenderName(event.target.value)} maxLength={40} placeholder="First name or nickname" autoComplete="nickname" />
+                {t('studio.yourName')}
+                <input value={senderName} onChange={(event) => setSenderName(event.target.value)} maxLength={40} placeholder={t('message.firstName')} autoComplete="nickname" />
               </label>
             </div>
 
             <div className="studio-toolbar send-row">
-              <button className="button ghost small" onClick={download}><Download size={17} /> Save for myself</button>
-              <button className="button primary small" onClick={openSendPopup}>Send with love <ArrowRight size={17} /></button>
+              <button className="button ghost small" onClick={download}><Download size={17} /> {t('studio.saveSelf')}</button>
+              <button className="button primary small" onClick={openSendPopup}>{t('studio.send')} <ArrowRight size={17} /></button>
             </div>
-            <p className="privacy-note">Drawings are saved on the Azalea server for delivery and the shared garden. Use Save progress in the header to keep drafts across visits. Undo/redo: Ctrl/Cmd+Z / Shift+Z.</p>
+            <p className="privacy-note">{t('studio.privacy')}</p>
 
             {sendOpen && (
               <div className="send-popup-backdrop" role="dialog" aria-modal="true" aria-labelledby="send-checklist-title">
                 <div className="send-popup">
                   <div className="send-popup-header">
                     <div>
-                      <p className="eyebrow">Before you send</p>
-                      <h3 id="send-checklist-title">Please confirm</h3>
+                      <p className="eyebrow">{t('studio.confirmEyebrow')}</p>
+                      <h3 id="send-checklist-title">{t('studio.confirmTitle')}</h3>
                     </div>
                     <button type="button" className="icon-button" onClick={() => setSendOpen(false)} aria-label="Close"><X /></button>
                   </div>
                   <ul className="send-guidelines">
-                    <li>Keep the message kind and respectful.</li>
-                    <li>Do not include personal contact details, addresses, or school names.</li>
-                    <li>Submissions are reviewed before they reach partner caretakers.</li>
+                    <li>{t('studio.g1')}</li>
+                    <li>{t('studio.g2')}</li>
+                    <li>{t('studio.g3')}</li>
                   </ul>
                   <label className="send-optional">
                     <input type="checkbox" checked={consentGallery} onChange={(event) => setConsentGallery(event.target.checked)} />
-                    Optional: feature this drawing in the shared garden gallery.
+                    {t('studio.galleryOpt')}
                   </label>
                   {submitError && <p className="form-error">{submitError}</p>}
                   <div className="send-popup-actions">
-                    <button type="button" className="button ghost" onClick={() => setSendOpen(false)}>Keep drawing</button>
+                    <button type="button" className="button ghost" onClick={() => setSendOpen(false)}>{t('studio.keep')}</button>
                     <button type="button" className="button primary" onClick={() => void submit()} disabled={submitting}>
-                      {submitting ? 'Saving…' : <>Confirm & send <ArrowRight size={17} /></>}
+                      {submitting ? t('studio.saving') : <>{t('studio.confirmSend')} <ArrowRight size={17} /></>}
                     </button>
                   </div>
                 </div>

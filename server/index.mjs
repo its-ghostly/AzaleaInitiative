@@ -7,14 +7,20 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.join(__dirname, '..')
-const DATA_DIR = path.join(ROOT, 'data')
+const DATA_DIR = process.env.AZALEA_DATA_DIR
+  ? path.resolve(process.env.AZALEA_DATA_DIR)
+  : path.join(ROOT, 'data')
 const MEDIA_DIR = path.join(DATA_DIR, 'media')
 const DB_PATH = path.join(DATA_DIR, 'db.json')
 
-const STAFF_EMAIL = 'celine.zhang@aloft9.com'
-const STAFF_PASSWORD = process.env.AZALEA_STAFF_PASSWORD || 'AzaleaCare2026'
+const STAFF_EMAIL = process.env.AZALEA_STAFF_EMAIL || 'celine.zhang@aloft9.com'
+const STAFF_PASSWORD = process.env.AZALEA_STAFF_PASSWORD || ''
 const PORT = Number(process.env.PORT || 8787)
 const NOTIFY_EMAIL = process.env.AZALEA_NOTIFY_EMAIL || STAFF_EMAIL
+
+if (!STAFF_PASSWORD) {
+  console.warn('Warning: AZALEA_STAFF_PASSWORD is not set. Staff login will be disabled until you set it.')
+}
 
 const FACILITIES = [
   {
@@ -84,8 +90,17 @@ function loadDb() {
     return db
   }
   const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'))
-  if (!db.staff || db.staff.email !== STAFF_EMAIL) {
-    const staff = hashPassword(STAFF_PASSWORD)
+  const needsStaffReset =
+    Boolean(STAFF_PASSWORD) && (
+      !db.staff ||
+      db.staff.email !== STAFF_EMAIL ||
+      !db.staff.salt ||
+      !db.staff.passwordHash ||
+      !verifyPassword(STAFF_PASSWORD, db.staff.salt, db.staff.passwordHash)
+    )
+
+  if (needsStaffReset) {
+    const staffCreds = hashPassword(STAFF_PASSWORD)
     db.staff = {
       id: 'u-staff',
       email: STAFF_EMAIL,
@@ -93,9 +108,10 @@ function loadDb() {
       role: 'super_admin',
       facilityId: 'hysiang-yuan',
       active: true,
-      salt: staff.salt,
-      passwordHash: staff.hash,
+      salt: staffCreds.salt,
+      passwordHash: staffCreds.hash,
     }
+    saveDb(db)
   }
   db.communityUsers = db.communityUsers || []
   db.submissions = db.submissions || []
@@ -258,6 +274,9 @@ app.post('/api/auth/staff/login', (req, res) => {
   const db = loadDb()
   const email = String(req.body.email || '').trim().toLowerCase()
   const password = String(req.body.password || '')
+  if (!STAFF_PASSWORD) {
+    return res.status(503).json({ error: 'Staff login is not configured. Set AZALEA_STAFF_PASSWORD on the server.' })
+  }
   if (email !== STAFF_EMAIL) {
     return res.status(403).json({ error: 'Staff access is limited to the authorized Azalea account.' })
   }

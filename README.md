@@ -1,33 +1,53 @@
 # Azalea Initiative
 
-A student-led community connecting Bay Area volunteers with people with disabilities and caregivers in Taiwan through art, messages, service, and fundraising.
+Student-led community connecting Bay Area neighbors with people with disabilities and their caregivers in Taiwan—through art, messages, volunteering, and shared care.
 
-Read [DESIGN.md](./DESIGN.md), [DRAWING_STUDIO_DESIGN.md](./DRAWING_STUDIO_DESIGN.md), and [COMMUNITY_PLATFORM_DESIGN.md](./COMMUNITY_PLATFORM_DESIGN.md) for product and platform plans.
+**Live site:** [https://ghost-sht.github.io/AzaleaInitiative/](https://ghost-sht.github.io/AzaleaInitiative/)
+
+## What’s here
+
+- Public website (mission, gallery, volunteer journal, updates, fundraising info)
+- Drawing studio and message flows
+- Community accounts + staff workspace (requires the API server)
+- English / 繁體中文 / 简体中文
+
+## Browse the site
+
+The GitHub Pages site is the public front door. Interactive features that save drawings or sign you in need the Azalea API running (locally or on a hosted server).
 
 ## Run locally
 
 ```bash
 npm install
+cp .env.example .env   # set AZALEA_STAFF_PASSWORD
 npm run dev
 ```
 
-This starts:
+- Site (Vite): [http://127.0.0.1:5173/](http://127.0.0.1:5173/)
+- API + production build: [http://127.0.0.1:8787/](http://127.0.0.1:8787/)
 
-- the Vite site at [http://127.0.0.1:5173/](http://127.0.0.1:5173/)
-- the Azalea API at [http://127.0.0.1:8787/](http://127.0.0.1:8787/)
+```bash
+npm run build
+npm start
+```
 
-Drawings are saved as image files under `data/media/` with metadata in `data/db.json`.
+Drawings are stored under `data/media/` with metadata in `data/db.json` (gitignored).
 
-## Accounts
+## Staff access
 
-**Staff (organizer / volunteer / caretaker tools)**  
-Only this account can open the Staff workspace:
+Staff tools are limited to the authorized organizer email configured in the server. Set `AZALEA_STAFF_PASSWORD` in your environment—never commit real passwords.
 
-- Email: `celine.zhang@aloft9.com`
-- Password: `AzaleaCare2026` (override with `AZALEA_STAFF_PASSWORD`)
+Open `/?page=staff` (or sign in from the header with the staff email) when the API is running.
 
-**Community members**  
-Use **Save progress** in the header to create a username + password account. Signed-in members keep drafts on the server across visits.
+## Project layout
+
+```
+src/                 React website
+server/              Express API (auth, drawings, volunteer apps)
+public/              Static images and brand assets
+docs/                Product and design notes
+.github/workflows/   GitHub Pages deploy
+```
 
 ## Checks
 
@@ -36,4 +56,4 @@ npm run lint
 npm run build
 ```
 
-Donation sections are marked Coming soon and do not accept payments yet.
+Donation sections are marked as not open yet and do not accept payments.

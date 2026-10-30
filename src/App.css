@@ -160,7 +160,6 @@ nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-un
 .statement { padding: 115px clamp(25px, 7vw, 110px) 100px; background: var(--cream); text-align: center; border-top: 1px solid var(--line); }
 .statement h2, .section-heading h2, .message-copy h2, .gallery-section h2, .updates-heading h2, .volunteer-heading h2, .mission-intro h2, .donation-heading h2 { font-size: clamp(48px, 4.6vw, 72px); line-height: 1.06; margin: 21px 0 27px; }
 .statement h2 em, .section-heading h2 em, .message-copy h2 em, .gallery-section h2 em { color: var(--coral); }
-.statement-cta { display: inline-flex; margin: 0 auto 28px; }
 .statement > p { max-width: 680px; margin: 0 auto; line-height: 1.75; color: #5a635c; font-size: 18px; }
 .values { display: grid; grid-template-columns: repeat(3,1fr); max-width: 1130px; margin: 80px auto 0; border-top: 1px solid var(--line); }
 .values article { position: relative; padding: 50px 55px 10px; border-right: 1px solid var(--line); }
@@ -550,22 +549,26 @@ nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-un
   color: #95978f;
   font-size: 11px;
 }
-.logo-page {
-  display: grid;
-  place-items: center;
-  padding: clamp(24px, 3.5vw, 40px);
+.floral-scatter-page {
+  overflow: hidden;
 }
-.logo-direct {
-  position: relative;
+.floral-scatter-page .scatter-icon {
+  position: absolute;
   z-index: 2;
-  width: min(78%, 260px);
-  height: auto;
-  display: block;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  border-radius: 0;
+  pointer-events: none;
+  stroke-width: 1.35;
+  color: #c65f77;
+  opacity: .55;
 }
+.floral-scatter-page .i1 { width: 58px; height: 58px; left: 10%; top: 12%; transform: rotate(-18deg); color: #e77560; }
+.floral-scatter-page .i2 { width: 44px; height: 44px; right: 14%; top: 16%; transform: rotate(22deg); color: #c65f77; opacity: .45; }
+.floral-scatter-page .i3 { width: 72px; height: 72px; left: 36%; top: 34%; transform: rotate(8deg); color: #e7a6c4; opacity: .5; }
+.floral-scatter-page .i4 { width: 40px; height: 40px; left: 14%; bottom: 28%; transform: rotate(-28deg); color: #c65f77; }
+.floral-scatter-page .i5 { width: 64px; height: 64px; right: 12%; bottom: 18%; transform: rotate(14deg); color: #e77560; opacity: .48; }
+.floral-scatter-page .i6 { width: 36px; height: 36px; left: 48%; bottom: 12%; transform: rotate(-6deg); color: #e7a6c4; opacity: .42; }
+.floral-scatter-page .i7 { width: 48px; height: 48px; right: 38%; top: 48%; transform: rotate(32deg); color: #c65f77; opacity: .4; }
+.floral-scatter-page .i8 { width: 30px; height: 30px; left: 62%; top: 18%; transform: rotate(-40deg); color: #e77560; opacity: .38; }
+.floral-scatter-page .i9 { width: 52px; height: 52px; left: 22%; top: 52%; transform: rotate(16deg); color: #e7a6c4; opacity: .46; }
 .illustrated-page { display: flex; flex-direction: column; justify-content: flex-end; }
 .page-tape { position: absolute; top: 18px; left: calc(50% - 44px); width: 88px; height: 25px; background: rgba(248,235,180,.77); transform: rotate(2deg); z-index: 3; }
 .activity-illustration { position: absolute; inset: 34px; border-radius: 10px; overflow: hidden; background: #0b7a6e; }
@@ -820,7 +823,6 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
   color: #c65f77; margin-bottom: 4px; font-weight: 600;
 }
   .story-page-body > small { padding-top: 12px; }
-  .logo-direct { width: min(72%, 200px); }
   .application-page form { gap: 13px; }
   .application-success { flex-direction: column; text-align: center; }
   .route { flex-wrap: wrap; }.route > div { min-width: 45px; }
@@ -1066,9 +1068,18 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
 .community-account.signed-in { display: inline-flex; align-items: center; gap: 8px; }
 .community-user { font-size: 13px; font-weight: 600; color: #5f675f; white-space: nowrap; }
 .community-auth-card {
-  position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; width: min(280px, 78vw);
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; width: min(300px, 82vw);
   display: grid; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 14px;
   background: #fffdf8; box-shadow: 0 12px 28px rgba(41,54,46,.12);
+}
+.community-auth-help {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #5f675f;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
 }
 .community-auth-card label {
   display: grid; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #5f675f;

@@ -32,3 +32,4 @@ data/db.json
 data/media/*
 !data/media/.gitkeep
 !data/.gitkeep
+.venv-i18n/

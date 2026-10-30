@@ -1,8 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { LogIn, LogOut, UserPlus } from 'lucide-react'
-import { getSessionUser, loginCommunity, logout, registerCommunity, subscribeStore } from '../platform/store'
+import {
+  getSessionUser,
+  loginCommunity,
+  loginStaff,
+  logout,
+  registerCommunity,
+  subscribeStore,
+} from '../platform/store'
+import { useLanguage } from '../i18n/LanguageContext'
 
 function CommunityAccount() {
+  const { t } = useLanguage()
   const [, setTick] = useState(0)
   const user = getSessionUser()
   const [mode, setMode] = useState<'login' | 'register'>('login')
@@ -21,11 +30,17 @@ function CommunityAccount() {
     event.preventDefault()
     setBusy(true)
     setError('')
+    const id = username.trim()
     try {
       if (mode === 'register') {
-        await registerCommunity(username, password, displayName || username)
+        if (id.includes('@')) {
+          throw new Error('Community accounts use a username, not an email. Pick a short username instead.')
+        }
+        await registerCommunity(id, password, displayName || id)
+      } else if (id.includes('@')) {
+        await loginStaff(id, password)
       } else {
-        await loginCommunity(username, password)
+        await loginCommunity(id, password)
       }
       setPassword('')
       setOpen(false)
@@ -39,9 +54,9 @@ function CommunityAccount() {
   if (community) {
     return (
       <div className="community-account signed-in">
-        <span className="community-user">Hi, {community.displayName}</span>
+        <span className="community-user">{t('auth.hi', { name: community.displayName })}</span>
         <button type="button" className="button ghost small" onClick={() => void logout()}>
-          <LogOut size={14} /> Sign out
+          <LogOut size={14} /> {t('auth.signOut')}
         </button>
       </div>
     )
@@ -50,7 +65,11 @@ function CommunityAccount() {
   if (user?.kind === 'staff') {
     return (
       <div className="community-account signed-in">
-        <span className="community-user">Staff: {user.displayName}</span>
+        <span className="community-user">{t('auth.staffLabel', { name: user.displayName })}</span>
+        <a className="button ghost small" href="?page=staff">{t('auth.openStaff')}</a>
+        <button type="button" className="button ghost small" onClick={() => void logout()}>
+          <LogOut size={14} /> {t('auth.signOut')}
+        </button>
       </div>
     )
   }
@@ -58,28 +77,39 @@ function CommunityAccount() {
   return (
     <div className="community-account">
       <button type="button" className="button ghost small" onClick={() => setOpen(!open)}>
-        <LogIn size={14} /> Save progress
+        <LogIn size={14} /> {t('auth.signIn')}
       </button>
       {open && (
         <form className="community-auth-card" onSubmit={onSubmit}>
-          <p className="eyebrow">{mode === 'login' ? 'Sign in to keep your drawings' : 'Create a free account'}</p>
+          <p className="eyebrow">{mode === 'login' ? t('auth.loginTitle') : t('auth.registerTitle')}</p>
+          <p className="community-auth-help">
+            {mode === 'login' ? t('auth.loginHelp') : t('auth.registerHelp')}
+          </p>
           <label>
-            Username
-            <input value={username} onChange={(event) => setUsername(event.target.value)} required minLength={3} maxLength={24} />
+            {mode === 'login' ? t('auth.usernameOrEmail') : t('auth.username')}
+            <input
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              required
+              minLength={3}
+              maxLength={mode === 'login' ? 64 : 24}
+              autoComplete={mode === 'login' ? 'username' : 'username'}
+              placeholder={mode === 'login' ? 'username or email' : 'choose a username'}
+            />
           </label>
           {mode === 'register' && (
             <label>
-              Display name
-              <input value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={40} placeholder="Optional" />
+              {t('auth.displayName')}
+              <input value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={40} placeholder={t('auth.optional')} />
             </label>
           )}
           <label>
-            Password
-            <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={6} />
+            {t('auth.password')}
+            <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={6} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
           </label>
           {error && <p className="form-error">{error}</p>}
           <button className="button primary small" type="submit" disabled={busy}>
-            {mode === 'login' ? <><LogIn size={14} /> Sign in</> : <><UserPlus size={14} /> Create account</>}
+            {mode === 'login' ? <><LogIn size={14} /> {t('auth.signIn')}</> : <><UserPlus size={14} /> {t('auth.create')}</>}
           </button>
           <button
             type="button"
@@ -89,7 +119,7 @@ function CommunityAccount() {
               setError('')
             }}
           >
-            {mode === 'login' ? 'Need an account? Register' : 'Have an account? Sign in'}
+            {mode === 'login' ? t('auth.needAccount') : t('auth.haveAccount')}
           </button>
         </form>
       )}

@@ -78,7 +78,12 @@ async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!headers.has('Content-Type') && init.body) headers.set('Content-Type', 'application/json')
   const token = getToken()
   if (token) headers.set('Authorization', `Bearer ${token}`)
-  const response = await fetch(path, { ...init, headers })
+  let response: Response
+  try {
+    response = await fetch(path, { ...init, headers })
+  } catch {
+    throw new Error('Could not reach the Azalea server. Make sure the site is running, then try again.')
+  }
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
     throw new Error((data as { error?: string }).error || `Request failed (${response.status})`)

@@ -46,7 +46,7 @@ function StatusTracker({ initialCode = '' }: { initialCode?: string }) {
   return (
     <section className="status-section" id="status">
       <div className="status-panel card-panel">
-        <span className="eyebrow">Drawing journey</span>
+        <span className="eyebrow">{t('track.eyebrow')}</span>
         <h2>{t('track.title')}</h2>
         <p>{t('track.body')}</p>
         <form
@@ -61,7 +61,7 @@ function StatusTracker({ initialCode = '' }: { initialCode?: string }) {
             <input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder="AZ-XXXX-XXXX" />
           </label>
           <button className="button primary" type="submit" disabled={looking}>
-            <Search size={16} /> {looking ? 'Looking…' : t('track.lookup')}
+            <Search size={16} /> {looking ? t('track.looking') : t('track.lookup')}
           </button>
         </form>
 
@@ -75,7 +75,7 @@ function StatusTracker({ initialCode = '' }: { initialCode?: string }) {
             <div>
               <p className="eyebrow">{submission.trackingCode}</p>
               <h3>{t(`track.stage.${submission.status}`) || submission.status}</h3>
-              <p><strong>From:</strong> {displaySenderName(submission.senderName, t('sender.anonymous'))}</p>
+              <p><strong>{t('track.from')}</strong> {displaySenderName(submission.senderName, t('sender.anonymous'))}</p>
               <p>{submission.note || t('track.noNote')}</p>
               {submission.rejectReason && <p className="form-error">Moderator note: {submission.rejectReason}</p>}
               <ol className="status-pipeline">

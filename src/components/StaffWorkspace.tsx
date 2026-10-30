@@ -86,17 +86,14 @@ function StaffWorkspace() {
     return (
       <section className="staff-section" id="staff">
         <div className="staff-login card-panel">
-          <span className="eyebrow"><ShieldCheck size={14} /> Staff workspace</span>
-          <h2>Sign in as Azalea staff</h2>
-          <p>
-            Staff tools (review, delivery, caretaker inbox, and gallery) are available only to the authorized
-            organizer account. Community members use <strong>Save progress</strong> in the header instead.
-          </p>
+          <span className="eyebrow"><ShieldCheck size={14} /> {t('staff.login.eyebrow')}</span>
+          <h2>{t('staff.login.title')}</h2>
+          <p>{t('staff.login.body')}</p>
           <form onSubmit={login} className="staff-login-form">
-            <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
-            <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
+            <label>{t('staff.login.email')}<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
+            <label>{t('staff.login.password')}<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
             {error && <p className="form-error">{error}</p>}
-            <button className="button primary" type="submit" disabled={busy}>Enter workspace <ArrowRight size={17} /></button>
+            <button className="button primary" type="submit" disabled={busy}>{t('staff.login.submit')} <ArrowRight size={17} /></button>
           </form>
         </div>
       </section>
@@ -107,7 +104,7 @@ function StaffWorkspace() {
     <section className={`staff-section${staffTab === 'gallery' ? ' staff-section-gallery' : ''}`} id="staff">
       <header className="staff-topbar">
         <div>
-          <span className="eyebrow">Signed in as {staffSession.role.replaceAll('_', ' ')}</span>
+          <span className="eyebrow">{t('staff.signedInAs', { role: staffSession.role.replaceAll('_', ' ') })}</span>
           <h2>{staffSession.displayName}</h2>
           <p>{staffSession.email}{staffSession.facilityId ? ` · ${staffSession.facilityId}` : ''}</p>
           <div className="staff-tabs" role="tablist" aria-label="Staff areas">
@@ -135,7 +132,7 @@ function StaffWorkspace() {
           {staffTab === 'workspace' && (
             <form className="staff-tag-lookup" onSubmit={lookupTag}>
               <label>
-                Tag ID
+                {t('staff.tagId')}
                 <input
                   value={tagQuery}
                   onChange={(event) => setTagQuery(event.target.value.toUpperCase())}
@@ -143,11 +140,11 @@ function StaffWorkspace() {
                   aria-label="Look up submission by tag ID"
                 />
               </label>
-              <button className="button ghost small" type="submit">Find</button>
+              <button className="button ghost small" type="submit">{t('staff.find')}</button>
             </form>
           )}
           {tagError && staffTab === 'workspace' && <p className="form-error staff-tag-error">{tagError}</p>}
-          <button className="button ghost" onClick={() => void signOut()}><LogOut size={16} /> Sign out</button>
+          <button className="button ghost" onClick={() => void signOut()}><LogOut size={16} /> {t('auth.signOut')}</button>
         </div>
       </header>
 
@@ -176,18 +173,19 @@ function StaffWorkspace() {
 }
 
 function VolunteerApplicationsPanel() {
+  const { t } = useLanguage()
   const applications = listVolunteerApplications()
   return (
     <div className="staff-panel">
       <div className="staff-panel-heading">
         <Users size={18} />
         <div>
-          <h3>Volunteer applications</h3>
-          <p>New interest forms are saved here and also drafted to {`celine.zhang@aloft9.com`}.</p>
+          <h3>{t('staff.apps.title')}</h3>
+          <p>{t('staff.apps.body')}</p>
         </div>
       </div>
       {applications.length === 0 ? (
-        <p className="empty-note">No applications yet.</p>
+        <p className="empty-note">{t('staff.apps.empty')}</p>
       ) : (
         <div className="application-inbox">
           {applications.map((item) => (
@@ -195,8 +193,8 @@ function VolunteerApplicationsPanel() {
               <p className="eyebrow">{new Date(item.createdAt).toLocaleString()}</p>
               <h4>{item.firstName}</h4>
               <p><a href={`mailto:${item.email}`}>{item.email}</a></p>
-              <p><strong>Stage:</strong> {item.stage}</p>
-              <p><strong>Interest:</strong> {item.interest}</p>
+              <p><strong>{t('staff.apps.stage')}</strong> {item.stage}</p>
+              <p><strong>{t('staff.apps.interest')}</strong> {item.interest}</p>
               <p>{item.motivation}</p>
             </article>
           ))}
@@ -265,6 +263,7 @@ function VolunteerQueue({
   setRejectReason: (value: string) => void
   onAct: (action: () => void | Promise<void>) => void | Promise<void>
 }) {
+  const { t } = useLanguage()
   const run = (action: () => Promise<unknown>) => void onAct(async () => { await action() })
   const queue = submissions.filter((item) =>
     ['received', 'needs_guardian', 'in_review', 'reviewed', 'translated'].includes(item.status),
@@ -275,13 +274,13 @@ function VolunteerQueue({
       <div className="staff-panel-heading">
         <Users size={18} />
         <div>
-          <h3>Volunteer task board</h3>
-          <p>Review → translate → deliver. Pick open tasks you are trained for.</p>
+          <h3>{t('staff.queue.title')}</h3>
+          <p>{t('staff.queue.body')}</p>
         </div>
       </div>
       <div className="staff-grid">
         <div className="queue-list">
-          {queue.length === 0 && <p className="empty-note">No open submissions yet. Send a drawing from the Draw page to populate this queue.</p>}
+          {queue.length === 0 && <p className="empty-note">{t('staff.queue.empty')}</p>}
           {queue.map((item) => (
             <button
               key={item.id}
@@ -289,7 +288,7 @@ function VolunteerQueue({
               className={`queue-item ${selected?.id === item.id ? 'active' : ''}`}
               onClick={() => onSelect(item.id)}
             >
-              <span className="tag-id-label">Tag ID</span>
+              <span className="tag-id-label">{t('staff.tagId')}</span>
               <strong className="tag-id">{item.trackingCode}</strong>
               <span>{item.status.replaceAll('_', ' ')}</span>
               <small>{displaySenderName(item.senderName)} · {new Date(item.createdAt).toLocaleString()}</small>
@@ -393,7 +392,7 @@ function CaretakerInbox({
             <img src={item.imageDataUrl} alt="" />
             <div>
               <p className="tag-id-row"><span className="tag-id-label">{t('staff.tagId')}</span> <code className="tag-id">{item.trackingCode}</code></p>
-              <p><strong>From:</strong> {displaySenderName(item.senderName, t('sender.anonymous'))}</p>
+              <p><strong>{t('track.from')}</strong> {displaySenderName(item.senderName, t('sender.anonymous'))}</p>
               {item.note ? <p>{item.note}</p> : null}
               {item.noteZh && <p lang="zh-Hant">{item.noteZh}</p>}
               <p className="inbox-status waiting">{t('staff.inbox.waiting')}</p>
@@ -481,13 +480,14 @@ function SuperAdminPanel({
   onAct: (action: () => void | Promise<void>) => void | Promise<void>
   actorEmail: string
 }) {
+  const { t } = useLanguage()
   return (
     <div className="staff-panel">
       <div className="staff-panel-heading">
         <ShieldCheck size={18} />
         <div>
-          <h3>Organizer controls</h3>
-          <p>Facility delivery format and recent audit activity.</p>
+          <h3>{t('staff.admin.title')}</h3>
+          <p>{t('staff.admin.body')}</p>
         </div>
       </div>
       <div className="admin-grid">
@@ -502,9 +502,9 @@ function SuperAdminPanel({
                 )
               }
             >
-              <option value="digital_inbox">Digital inbox</option>
-              <option value="print_packet">Print packet</option>
-              <option value="slideshow">Slideshow</option>
+              <option value="digital_inbox">{t('staff.admin.digital')}</option>
+              <option value="print_packet">{t('staff.admin.print')}</option>
+              <option value="slideshow">{t('staff.admin.slideshow')}</option>
             </select>
           </label>
         ))}

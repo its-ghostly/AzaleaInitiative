@@ -1,8 +1,11 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// https://vite.dev/config/
+// Local/API builds use `/`. GitHub Pages sets VITE_BASE=/AzaleaInitiative/
+const base = process.env.VITE_BASE || '/'
+
 export default defineConfig({
+  base,
   plugins: [react()],
   server: {
     proxy: {

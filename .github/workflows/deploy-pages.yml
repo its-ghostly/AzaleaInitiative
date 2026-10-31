@@ -32,7 +32,10 @@ jobs:
 
       - name: Build site for GitHub Pages
         env:
-          VITE_BASE: /AzaleaInitiative/
+          # Custom domain (azaleainitiative.com) serves from site root.
+          # Use /AzaleaInitiative/ only if publishing solely at
+          # https://its-ghostly.github.io/AzaleaInitiative/
+          VITE_BASE: /
           # Optional: set repo variable AZALEA_API_BASE to your always-on API URL
           VITE_API_BASE: ${{ vars.AZALEA_API_BASE }}
         run: npm run build

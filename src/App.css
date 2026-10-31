@@ -18,7 +18,6 @@ em { font-family: 'Playfair Display', serif; font-weight: 500; }
 .page-home .updates-section,
 .page-home .volunteer-section,
 .page-home .guidelines-section,
-.page-home .connect-section,
 .page-home .message-section,
 .page-home .gallery-section,
 .page-home .draw-section,
@@ -44,6 +43,62 @@ em { font-family: 'Playfair Display', serif; font-weight: 500; }
 .page-home .current-mission-section { padding-block: 72px 80px; }
 .page-home .donation-section { padding-block: 72px 80px; }
 .page-home .scroll-note { display: none; }
+.coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(41, 54, 46, .08);
+  color: var(--forest);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.coming-soon-inline {
+  margin-left: 8px;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: .72;
+}
+.coming-soon-card {
+  pointer-events: none;
+  opacity: .88;
+  cursor: default;
+  position: relative;
+}
+.coming-soon-card .coming-soon-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+.coming-soon-cta {
+  pointer-events: none;
+  opacity: .72;
+  cursor: not-allowed;
+}
+.coming-soon-panel {
+  max-width: 560px;
+  margin: 36px auto;
+  padding: 32px 28px;
+  text-align: center;
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.coming-soon-panel h2 {
+  font-size: clamp(28px, 3vw, 40px);
+  margin: 14px 0 12px;
+}
+.coming-soon-panel p {
+  color: #5c675f;
+  margin-bottom: 22px;
+}
+.nav-coming-soon {
+  opacity: .85;
+}
 .eyebrow { display: inline-flex; align-items: center; gap: 7px; text-transform: uppercase; letter-spacing: .16em; font-size: 14px; font-weight: 600; }
 .eyebrow.centered { display: flex; justify-content: center; }
 .eyebrow.light { color: #d7dfd3; }
@@ -175,6 +230,29 @@ nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-un
   content: ''; width: 36px; height: 3px; display: inline-block; background: var(--azalea); margin-left: 4px;
 }
 .connection-grid { display: grid; grid-template-columns: repeat(3,1fr); max-width: 1200px; margin: 60px auto 0; gap: 15px; }
+.connect-volunteer-cta {
+  max-width: 1200px;
+  margin: 42px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 28px;
+  padding: 22px 26px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .55);
+}
+.connect-volunteer-cta p {
+  margin: 0;
+  max-width: 42rem;
+  color: #4f5b53;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+.connect-volunteer-cta .button {
+  flex-shrink: 0;
+}
 .connection-card {
   border: 0; min-height: 320px; padding: 28px; color: white; display: flex; flex-direction: column; align-items: flex-start;
   text-decoration: none; cursor: pointer; text-align: left; transition: transform .25s ease; position: relative;
@@ -381,6 +459,17 @@ nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-un
 .volunteer-heading, .sketchbook, .book-controls { position: relative; z-index: 1; }
 .volunteer-heading { max-width: 740px; }
 .sketchbook { max-width: 1160px; margin: 65px auto 0; }
+.journal-years {
+  display: flex; align-items: baseline; gap: 22px; padding-left: 95px; margin-bottom: 14px;
+  overflow-x: auto; scrollbar-width: thin;
+}
+.journal-years button {
+  border: 0; background: transparent; padding: 0 0 6px; cursor: pointer;
+  color: #6a7870; font-family: inherit; font-size: 20px; font-weight: 600; letter-spacing: .04em;
+  border-bottom: 2px solid transparent; transition: color .2s ease, border-color .2s ease;
+}
+.journal-years button:hover { color: #087e71; }
+.journal-years button[aria-selected='true'] { color: #055d57; border-bottom-color: #c65f77; }
 .bookmarks { display: flex; align-items: flex-end; gap: 6px; padding-left: 95px; overflow-x: auto; scrollbar-width: thin; }
 .bookmarks button {
   min-width: 128px; border: 0; border-radius: 12px 12px 0 0; padding: 13px 15px 11px; background: #9bcf87;
@@ -542,6 +631,29 @@ nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-un
   display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
   color: #c65f77; margin-bottom: 4px; font-weight: 600;
 }
+.collage-clipping { transform: rotate(-0.6deg); }
+.photo-collage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-rows: 1.15fr 0.55fr 0.7fr;
+  gap: 6px;
+  padding: 8px;
+  background: #f3ebe0;
+}
+.photo-collage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: 1px solid rgba(80, 62, 48, .12);
+  background: #ddd;
+}
+.photo-collage img:nth-child(1) { grid-column: 1; grid-row: 1 / 3; }
+.photo-collage img:nth-child(2) { grid-column: 2; grid-row: 1; }
+.photo-collage img:nth-child(3) { grid-column: 2; grid-row: 2 / 4; }
+.photo-collage img:nth-child(4) { grid-column: 1; grid-row: 3; }
 .story-page-body > small {
   display: block;
   margin-top: auto;
@@ -773,7 +885,7 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
   .volunteer-florals .top-left, .volunteer-florals .bottom-left { width: min(180px, 48vw); }
   .volunteer-florals .top-right { width: min(340px, 72vw); opacity: .9; }
   .volunteer-florals .bottom-right { width: min(170px, 46vw); opacity: .75; }
-  .bookmarks { padding-left: 62px; }
+  .journal-years, .bookmarks { padding-left: 62px; }
   .book-cover { padding-left: 65px; }
   .story-page h3, .join-page h3 { font-size: 36px; }
   .bulletin-board { min-height: 0; padding: 42px 32px; }
@@ -792,6 +904,8 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
   .statement h2, .section-heading h2, .message-copy h2, .gallery-section h2, .updates-heading h2, .volunteer-heading h2, .mission-intro h2, .donation-heading h2 { font-size: 42px; }
   .form-footer > span { display: none; }
   .sketchbook { margin-inline: -10px; }
+  .journal-years { padding-left: 48px; gap: 16px; }
+  .journal-years button { font-size: 18px; }
   .bookmarks { padding-left: 48px; }.bookmarks button { min-width: 108px; padding-inline: 11px; }
   .book-cover { padding: 15px 15px 15px 56px; border-width: 4px; border-radius: 18px; }
   .book-spine { width: 34px; inset: 12px auto 12px 10px; padding-inline: 5px; }

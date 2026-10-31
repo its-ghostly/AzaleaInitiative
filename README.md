@@ -2,15 +2,16 @@
 
 Student-led community connecting Bay Area neighbors with people with disabilities and their caregivers in Taiwan—through art, messages, volunteering, and shared care.
 
-**Live site (after Pages is turned on):** [https://ghost-sht.github.io/AzaleaInitiative/](https://ghost-sht.github.io/AzaleaInitiative/)
+**Live site:** [https://azaleainitiative.com/](https://azaleainitiative.com/) ([GitHub Pages](https://its-ghostly.github.io/AzaleaInitiative/))
 
 ### Turn on GitHub Pages (one-time)
 
-1. Open [Pages settings](https://github.com/ghost-sht/AzaleaInitiative/settings/pages) while signed in as **ghost-sht**
-2. Under **Build and deployment → Source**, choose **Deploy from a branch**
-3. Branch: **gh-pages** / folder: **/ (root)** → Save
+1. Open [Pages settings](https://github.com/its-ghostly/AzaleaInitiative/settings/pages) while signed in as **its-ghostly**
+2. Under **Build and deployment → Source**, choose **GitHub Actions** (or Deploy from branch `gh-pages`)
+3. Under **Custom domain**, enter `azaleainitiative.com` → Save, then enable **Enforce HTTPS** after DNS checks pass
+4. In Squarespace DNS, `www` **CNAME** should target **`its-ghostly.github.io`** (not an old username)
 
-The public site will appear at the link above within a minute or two.
+Deploys run from `.github/workflows/deploy-pages.yml` on pushes to `main`, or from the `gh-pages` branch. The build uses `VITE_BASE=/` so the custom domain loads correctly.
 
 > Note: GitHub Pages hosts the website front-end. Saving drawings, sign-in, and staff tools still need the API server (`npm start` locally, or a host like Railway later).
 

@@ -15,7 +15,7 @@ function apiBase() {
   const fromEnv = String(import.meta.env.VITE_API_BASE || '').replace(/\/$/, '')
   if (fromEnv) return fromEnv
   if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
-    // Fallback when Pages was built without VITE_API_BASE
+    // Fallback when Pages was built without VITE_API_BASE (temporary tunnel; update when API is hosted)
     return 'https://experiencing-islands-logan-june.trycloudflare.com'
   }
   return ''

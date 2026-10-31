@@ -103,7 +103,7 @@ function StatusTracker({ initialCode = '' }: { initialCode?: string }) {
                 </div>
               )}
 
-              <a className="button ghost" href="?page=draw">{t('track.createAnother')} <ArrowRight size={16} /></a>
+              <a className="button ghost" href="./">{t('hero.ctaMission')} <ArrowRight size={16} /></a>
             </div>
           </div>
         )}

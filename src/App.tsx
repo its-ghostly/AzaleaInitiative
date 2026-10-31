@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   ArrowDown,
   ArrowRight,
@@ -17,40 +17,121 @@ import {
 } from 'lucide-react'
 import './App.css'
 import CommunityAccount from './components/CommunityAccount'
-import DrawingStudio from './components/DrawingStudio'
 import StaffWorkspace from './components/StaffWorkspace'
 import StatusTracker from './components/StatusTracker'
 import { LanguageSwitch, useLanguage } from './i18n/LanguageContext'
 import { asset } from './lib/asset'
-import { displaySenderName, submitVolunteerApplication } from './platform/store'
+import { submitVolunteerApplication } from './platform/store'
 import { usePlatform } from './platform/usePlatform'
 
+function ComingSoonPanel() {
+  const { t } = useLanguage()
+  return (
+    <div className="coming-soon-panel">
+      <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
+      <h2>{t('comingSoon.title')}</h2>
+      <p>{t('comingSoon.body')}</p>
+      <a className="button ghost" href="./">{t('hero.ctaMission')}</a>
+    </div>
+  )
+}
+
+type VolunteerPageId = 'why' | 'camp' | 'mooncake' | 'press' | 'cafe' | 'mayor' | 'debrief' | 'expand'
 type VolunteerPageMeta = {
-  id: 'why' | 'camp' | 'press'
+  id: VolunteerPageId
   art: string
   articleUrl?: string
   articleSource?: string
   image?: string
+  images?: string[]
   detailCount: number
 }
 
-const VOLUNTEER_PAGES: VolunteerPageMeta[] = [
-  { id: 'why', art: 'florals', detailCount: 3 },
+/** Timeless pages — always attached to the most recent year journal. */
+const VOLUNTEER_INTRO: VolunteerPageMeta = { id: 'why', art: 'florals', detailCount: 3 }
+
+/** Story pages by year. Journals are listed newest → oldest. */
+const VOLUNTEER_JOURNALS: { year: number; pages: VolunteerPageMeta[] }[] = [
   {
-    id: 'camp',
-    art: 'garden',
-    image: 'press/together-we-shine.jpg',
-    detailCount: 4,
+    year: 2026,
+    pages: [
+      {
+        id: 'camp',
+        art: 'garden',
+        image: 'press/together-we-shine.jpg',
+        detailCount: 4,
+      },
+    ],
   },
   {
-    id: 'press',
-    art: 'press',
-    articleUrl: 'https://hoomedia.com.tw/2025/07/02/76051/',
-    articleSource: '互傳媒 Hoo Media',
-    image: 'press/hoomedia-camping.jpg',
-    detailCount: 3,
+    year: 2025,
+    pages: [
+      {
+        id: 'mooncake',
+        art: 'mooncake',
+        images: [
+          'press/mooncake-2025/stirring.jpg',
+          'press/mooncake-2025/workshop.jpg',
+          'press/mooncake-2025/table.jpg',
+          'press/mooncake-2025/molds.jpg',
+        ],
+        detailCount: 3,
+      },
+      {
+        id: 'press',
+        art: 'press',
+        articleUrl: 'https://hoomedia.com.tw/2025/07/02/76051/',
+        articleSource: '互傳媒 Hoo Media',
+        image: 'press/hoomedia-camping.jpg',
+        detailCount: 3,
+      },
+      {
+        id: 'expand',
+        art: 'expand',
+        image: 'press/sj-expand-meeting.jpg',
+        detailCount: 3,
+      },
+    ],
+  },
+  {
+    year: 2024,
+    pages: [
+      {
+        id: 'cafe',
+        art: 'cafe',
+        image: 'press/cafe-transition.jpg',
+        detailCount: 3,
+      },
+      {
+        id: 'mayor',
+        art: 'mayor',
+        image: 'press/mayor-awards.jpg',
+        detailCount: 3,
+      },
+      {
+        id: 'debrief',
+        art: 'debrief',
+        image: 'press/first-debrief.jpg',
+        detailCount: 3,
+      },
+    ],
   },
 ]
+
+const LATEST_VOLUNTEER_YEAR = VOLUNTEER_JOURNALS[0].year
+
+function pagesForVolunteerYear(year: number): VolunteerPageMeta[] {
+  const journal = VOLUNTEER_JOURNALS.find((entry) => entry.year === year)
+  const yearPages = journal?.pages ?? []
+  return year === LATEST_VOLUNTEER_YEAR ? [VOLUNTEER_INTRO, ...yearPages] : yearPages
+}
+
+function volunteerPhotoCredit(id: VolunteerPageId): `volunteer.${VolunteerPageId}.credit` | 'volunteer.ourVolunteers' {
+  if (id === 'press' || id === 'mooncake' || id === 'cafe' || id === 'mayor' || id === 'debrief' || id === 'expand') {
+    return `volunteer.${id}.credit`
+  }
+  return 'volunteer.ourVolunteers'
+}
 
 const CONNECT_PAGES = ['draw', 'thank', 'view'] as const
 type SitePage = 'home' | 'draw' | 'thank' | 'view' | 'updates' | 'volunteer' | 'staff' | 'status'
@@ -73,32 +154,31 @@ function resolvePage(): SitePage {
 
 function App() {
   const { t } = useLanguage()
-  const { submissions, user } = usePlatform()
+  const { user } = usePlatform()
   const isStaff = user?.kind === 'staff'
   const [menuOpen, setMenuOpen] = useState(false)
-  const [sendOpen, setSendOpen] = useState(false)
-  const [messageSent, setMessageSent] = useState(false)
   const [applicationSent, setApplicationSent] = useState(false)
+  const [volunteerYear, setVolunteerYear] = useState(LATEST_VOLUNTEER_YEAR)
   const [volunteerPage, setVolunteerPage] = useState(0)
   const [flipDir, setFlipDir] = useState<'forward' | 'back'>('forward')
   const page = resolvePage()
   const sendActive = CONNECT_PAGES.includes(page as typeof CONNECT_PAGES[number])
-  const gardenArt = submissions
-    .filter((item) => item.status !== 'rejected' && Boolean(item.imageDataUrl))
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  const gardenMats = ['staff-art-sun', 'staff-art-sky', 'staff-art-bloom'] as const
-  const activeVolunteer = volunteerPage < VOLUNTEER_PAGES.length ? VOLUNTEER_PAGES[volunteerPage] : null
-
-  useEffect(() => {
-    if (!sendOpen) return
-    const close = () => setSendOpen(false)
-    window.addEventListener('click', close)
-    return () => window.removeEventListener('click', close)
-  }, [sendOpen])
+  const volunteerPages = pagesForVolunteerYear(volunteerYear)
+  const isLatestJournal = volunteerYear === LATEST_VOLUNTEER_YEAR
+  const volunteerPageCount = volunteerPages.length + (isLatestJournal ? 1 : 0)
+  const activeVolunteer = volunteerPage < volunteerPages.length ? volunteerPages[volunteerPage] : null
+  const showingJoin = isLatestJournal && volunteerPage === volunteerPages.length
 
   const turnVolunteerPage = (next: number) => {
     setFlipDir(next > volunteerPage ? 'forward' : 'back')
     setVolunteerPage(next)
+  }
+
+  const openVolunteerYear = (year: number) => {
+    if (year === volunteerYear) return
+    setFlipDir(year < volunteerYear ? 'forward' : 'back')
+    setVolunteerYear(year)
+    setVolunteerPage(0)
   }
 
   return (
@@ -116,31 +196,14 @@ function App() {
         <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)}>
           <div className="nav-home-group" aria-label="Homepage sections">
             <a href="./#mission">{t('nav.mission')}</a>
-            <div
-              className={`nav-dropdown${sendOpen ? ' open' : ''}${sendActive ? ' active' : ''}`}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <button
-                type="button"
-                className="nav-link-button nav-dropdown-toggle"
-                aria-expanded={sendOpen}
-                aria-haspopup="menu"
-                onClick={() => setSendOpen((open) => !open)}
-              >
-                {t('nav.send')} <span className="nav-caret" aria-hidden="true" />
-              </button>
-              <div className="nav-dropdown-menu" role="menu" hidden={!sendOpen}>
-                <a role="menuitem" href="?page=draw" aria-current={page === 'draw' ? 'page' : undefined}>{t('nav.draw')}</a>
-                <a role="menuitem" href="?page=thank" aria-current={page === 'thank' ? 'page' : undefined}>{t('nav.thank')}</a>
-                <a role="menuitem" href="?page=view" aria-current={page === 'view' ? 'page' : undefined}>{t('nav.view')}</a>
-              </div>
-            </div>
+            <a className={`nav-link-button nav-coming-soon${sendActive ? ' active' : ''}`} href="./#connect" aria-disabled="true">
+              {t('nav.send')} <span className="coming-soon-inline">{t('comingSoon.badge')}</span>
+            </a>
             <a href="./#current-mission">{t('nav.current')}</a>
             <a className="nav-cta" href="./#donate">{t('nav.donate')} <ArrowRight size={16} /></a>
           </div>
           <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
           <a href="?page=volunteer" aria-current={page === 'volunteer' ? 'page' : undefined}>{t('nav.volunteer')}</a>
-          <a href="?page=status" aria-current={page === 'status' ? 'page' : undefined}>{t('nav.track')}</a>
           {isStaff ? (
             <a href="?page=staff" aria-current={page === 'staff' ? 'page' : undefined}>{t('nav.staff')}</a>
           ) : null}
@@ -154,7 +217,7 @@ function App() {
             <h1 dangerouslySetInnerHTML={{ __html: t('hero.title') }} />
             <p>{t('hero.body')}</p>
             <div className="hero-actions">
-              <a className="button primary" href="?page=draw">{t('hero.ctaDraw')} <Brush size={18} /></a>
+              <span className="button primary coming-soon-cta" aria-disabled="true">{t('hero.ctaDraw')} <Brush size={18} /></span>
               <a className="button text-link" href="#mission">{t('hero.ctaMission')} <ArrowDown size={18} /></a>
             </div>
           </div>
@@ -212,7 +275,7 @@ function App() {
         </section>
 
         <section className="draw-section" id="draw">
-          <DrawingStudio embedded onClose={() => { window.location.href = './' }} />
+          <ComingSoonPanel />
         </section>
 
         <section className="connect-section" id="connect">
@@ -221,32 +284,38 @@ function App() {
             <h2 dangerouslySetInnerHTML={{ __html: t('connect.title') }} />
           </div>
           <div className="connection-grid">
-            <a className="connection-card coral" href="?page=draw">
+            <div className="connection-card coral coming-soon-card">
+              <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
               <span className="card-number">01</span>
               <span className="card-icon"><Brush /></span>
               <span>
                 <strong>{t('connect.draw.title')}</strong>
                 <small>{t('connect.draw.body')}</small>
               </span>
-              <ArrowRight className="card-arrow" />
-            </a>
-            <a className="connection-card blue" href="?page=thank">
+            </div>
+            <div className="connection-card blue coming-soon-card">
+              <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
               <span className="card-number">02</span>
               <span className="card-icon"><Mail /></span>
               <span>
                 <strong>{t('connect.thank.title')}</strong>
                 <small>{t('connect.thank.body')}</small>
               </span>
-              <ArrowRight className="card-arrow" />
-            </a>
-            <a className="connection-card gold" href="?page=view">
+            </div>
+            <div className="connection-card gold coming-soon-card">
+              <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
               <span className="card-number">03</span>
               <span className="card-icon"><Sparkles /></span>
               <span>
                 <strong>{t('connect.view.title')}</strong>
                 <small>{t('connect.view.body')}</small>
               </span>
-              <ArrowRight className="card-arrow" />
+            </div>
+          </div>
+          <div className="connect-volunteer-cta">
+            <p>{t('connect.volunteer.prompt')}</p>
+            <a className="button primary" href="?page=volunteer">
+              {t('connect.volunteer.cta')} <Users size={18} />
             </a>
           </div>
         </section>
@@ -255,28 +324,10 @@ function App() {
           <div className="message-copy">
             <span className="eyebrow">{t('message.eyebrow')}</span>
             <h2 dangerouslySetInnerHTML={{ __html: t('message.title') }} />
-            <p>{t('message.body')}</p>
-            <div className="translation-note"><span>EN</span><div></div><span>繁</span> {t('message.translate')}</div>
+            <p>{t('comingSoon.body')}</p>
           </div>
           <div className="note-card">
-            {messageSent ? (
-              <div className="note-success">
-                <span><Check /></span>
-                <h3>{t('message.thanksTitle')}</h3>
-                <p>{t('message.thanksBody')}</p>
-                <button className="text-button" onClick={() => setMessageSent(false)}>{t('message.writeAnother')}</button>
-              </div>
-            ) : (
-              <form onSubmit={(event) => { event.preventDefault(); setMessageSent(true) }}>
-                <label htmlFor="note">{t('message.dear')}</label>
-                <textarea id="note" required maxLength={500} placeholder={t('message.placeholder')} />
-                <div className="form-footer">
-                  <span>{t('message.nameOptional')}</span>
-                  <input aria-label={t('message.firstName')} placeholder={t('message.firstName')} maxLength={40} />
-                  <button className="round-submit" aria-label={t('message.send')}><ArrowRight /></button>
-                </div>
-              </form>
-            )}
+            <ComingSoonPanel />
           </div>
         </section>
 
@@ -288,22 +339,7 @@ function App() {
             </div>
             <p>{t('gallery.body')}</p>
           </div>
-          {gardenArt.length === 0 ? (
-            <p className="staff-gallery-empty">{t('gallery.empty')}</p>
-          ) : (
-            <div className="gallery-row staff-gallery-row" aria-label={t('gallery.label')}>
-              {gardenArt.map((item, index) => (
-                <article key={item.id} className={`art-card ${gardenMats[index % gardenMats.length]}`}>
-                  <div className="staff-art-frame">
-                    <img src={item.imageDataUrl} alt="" />
-                  </div>
-                  <p>{displaySenderName(item.senderName, t('sender.anonymous'))}</p>
-                  <small>{item.note?.trim() || new Date(item.createdAt).toLocaleDateString()}</small>
-                </article>
-              ))}
-            </div>
-          )}
-          <p className="gallery-caption"><Sparkles size={15} /> {t('gallery.caption')}</p>
+          <ComingSoonPanel />
         </section>
 
         <section className="updates-section" id="updates">
@@ -352,10 +388,24 @@ function App() {
             <p>{t('volunteer.body')}</p>
           </div>
           <div className="sketchbook" id="volunteer-application">
-            <div className="bookmarks" role="tablist" aria-label="Volunteer sketchbook pages">
-              {VOLUNTEER_PAGES.map((item, index) => (
+            <div className="journal-years" role="tablist" aria-label={t('volunteer.yearsLabel')}>
+              {VOLUNTEER_JOURNALS.map((journal) => (
+                <button
+                  key={journal.year}
+                  type="button"
+                  role="tab"
+                  aria-selected={volunteerYear === journal.year}
+                  onClick={() => openVolunteerYear(journal.year)}
+                >
+                  {journal.year}
+                </button>
+              ))}
+            </div>
+            <div className="bookmarks" role="tablist" aria-label={`${volunteerYear} ${t('volunteer.pagesLabel')}`}>
+              {volunteerPages.map((item, index) => (
                 <button
                   key={item.id}
+                  type="button"
                   role="tab"
                   aria-selected={volunteerPage === index}
                   onClick={() => turnVolunteerPage(index)}
@@ -363,19 +413,22 @@ function App() {
                   <span>0{index + 1}</span>{t(`volunteer.${item.id}.tab`)}
                 </button>
               ))}
-              <button
-                className="join-bookmark"
-                role="tab"
-                aria-selected={volunteerPage === VOLUNTEER_PAGES.length}
-                onClick={() => turnVolunteerPage(VOLUNTEER_PAGES.length)}
-              >
-                <span>05</span>{t('volunteer.joinTab')}
-              </button>
+              {isLatestJournal ? (
+                <button
+                  type="button"
+                  className="join-bookmark"
+                  role="tab"
+                  aria-selected={showingJoin}
+                  onClick={() => turnVolunteerPage(volunteerPages.length)}
+                >
+                  <span>0{volunteerPages.length + 1}</span>{t('volunteer.joinTab')}
+                </button>
+              ) : null}
             </div>
             <div className="book-cover">
-              <div className="book-spine"><Flower2 /><span>AZALEA<br />FIELD NOTES</span></div>
+              <div className="book-spine"><Flower2 /><span>AZALEA<br />{volunteerYear}</span></div>
               <div className="book-paper-edge"></div>
-              <div className={`book-spread turning-${flipDir}`} key={volunteerPage}>
+              <div className={`book-spread turning-${flipDir}`} key={`${volunteerYear}-${volunteerPage}`}>
                 {activeVolunteer ? (
                   <>
                     <article className="sketch-page story-page">
@@ -395,7 +448,7 @@ function App() {
                           </a>
                         ) : null}
                         <small>
-                          {activeVolunteer.image
+                          {activeVolunteer.image || activeVolunteer.images?.length
                             ? t('volunteer.fromNotes')
                             : t('volunteer.fieldNote')}
                         </small>
@@ -413,13 +466,28 @@ function App() {
                         <Flower2 className="scatter-icon i8" />
                         <Flower2 className="scatter-icon i9" />
                       </div>
+                    ) : activeVolunteer.images?.length ? (
+                      <div className="sketch-page illustrated-page press-page photo-page collage-page">
+                        <div className="page-tape"></div>
+                        <figure className="press-clipping collage-clipping">
+                          <div className="photo-collage" aria-label={t(`volunteer.${activeVolunteer.id}.caption`)}>
+                            {activeVolunteer.images.map((src) => (
+                              <img key={src} src={asset(src)} alt="" />
+                            ))}
+                          </div>
+                          <figcaption>
+                            <span>{t(volunteerPhotoCredit(activeVolunteer.id))}</span>
+                            {t(`volunteer.${activeVolunteer.id}.caption`)}
+                          </figcaption>
+                        </figure>
+                      </div>
                     ) : activeVolunteer.image ? (
                       <div className={`sketch-page illustrated-page press-page${activeVolunteer.art === 'press' ? '' : ' photo-page'}`}>
                         <div className="page-tape"></div>
                         <figure className="press-clipping">
                           <img src={asset(activeVolunteer.image)} alt={t(`volunteer.${activeVolunteer.id}.caption`) || t(`volunteer.${activeVolunteer.id}.title`)} />
                           <figcaption>
-                            <span>{activeVolunteer.art === 'press' ? t('volunteer.press.credit') : t('volunteer.ourVolunteers')}</span>
+                            <span>{t(volunteerPhotoCredit(activeVolunteer.id))}</span>
                             {t(`volunteer.${activeVolunteer.id}.caption`)}
                           </figcaption>
                         </figure>
@@ -435,10 +503,10 @@ function App() {
                       </div>
                     )}
                   </>
-                ) : (
+                ) : showingJoin ? (
                   <>
                     <article className="sketch-page join-page">
-                      <span className="page-number">0{VOLUNTEER_PAGES.length + 1}</span>
+                      <span className="page-number">0{volunteerPages.length + 1}</span>
                       <span className="hand-label">{t('volunteer.apply.kicker')}</span>
                       <h3>{t('volunteer.apply.title')}</h3>
                       <p>{t('volunteer.apply.body')}</p>
@@ -486,13 +554,13 @@ function App() {
                       )}
                     </div>
                   </>
-                )}
+                ) : null}
               </div>
             </div>
             <div className="book-controls">
               <button disabled={volunteerPage === 0} onClick={() => turnVolunteerPage(Math.max(0, volunteerPage - 1))}>{t('volunteer.prev')}</button>
-              <span>{volunteerPage + 1} / {VOLUNTEER_PAGES.length + 1}</span>
-              <button disabled={volunteerPage === VOLUNTEER_PAGES.length} onClick={() => turnVolunteerPage(Math.min(VOLUNTEER_PAGES.length, volunteerPage + 1))}>{t('volunteer.next')}</button>
+              <span>{volunteerPage + 1} / {volunteerPageCount}</span>
+              <button disabled={volunteerPage === volunteerPageCount - 1} onClick={() => turnVolunteerPage(Math.min(volunteerPageCount - 1, volunteerPage + 1))}>{t('volunteer.next')}</button>
             </div>
           </div>
         </section>
@@ -561,7 +629,7 @@ function App() {
             <aside className="fund-status-note" aria-label="Donation status">
               <p className="fund-status-title">{t('donate.statusTitle')}</p>
               <p>{t('donate.statusBody')}</p>
-              <a className="button ghost small" href="?page=draw">{t('donate.drawInstead')}</a>
+              <span className="button ghost small coming-soon-cta" aria-disabled="true">{t('donate.drawInstead')}</span>
             </aside>
           </div>
         </section>
@@ -585,7 +653,7 @@ function App() {
         </div>
         <div className="footer-links">
           <div><strong>{t('footer.explore')}</strong><a href="./#mission">{t('footer.mission')}</a><a href="?page=updates">{t('footer.updates')}</a><a href="./#current-mission">{t('footer.current')}</a></div>
-          <div><strong>{t('footer.involved')}</strong><a href="?page=draw">{t('footer.art')}</a><a href="?page=volunteer">{t('footer.volunteer')}</a><a href="./#donate">{t('footer.donate')}</a></div>
+          <div><strong>{t('footer.involved')}</strong><a href="./#connect">{t('footer.art')}</a><a href="?page=volunteer">{t('footer.volunteer')}</a><a href="./#donate">{t('footer.donate')}</a></div>
         </div>
         <div className="footer-bottom"><span>© 2026 Azalea Initiative</span><span>{t('footer.care')}</span></div>
       </footer>

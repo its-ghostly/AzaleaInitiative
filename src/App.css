@@ -463,7 +463,7 @@ nav .nav-volunteer svg { flex: 0 0 auto; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 22px;
-  max-width: 720px;
+  max-width: 980px;
 }
 .local-card {
   padding: 28px 26px 26px;

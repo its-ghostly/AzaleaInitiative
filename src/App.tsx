@@ -13,6 +13,7 @@ import {
   Megaphone,
   Menu,
   ShieldCheck,
+  Shirt,
   Sparkles,
   Users,
 } from 'lucide-react'
@@ -927,6 +928,25 @@ function App() {
                 rel="noreferrer"
               >
                 {t('local.learners.cta')} <ArrowRight size={16} />
+              </a>
+            </article>
+            <article className="local-card">
+              <Shirt size={22} aria-hidden="true" />
+              <p className="local-when">{t('local.tshirt.when')}</p>
+              <h3>{t('local.tshirt.title')}</h3>
+              <p>{t('local.tshirt.body')}</p>
+              <ul>
+                <li>{t('local.tshirt.d1')}</li>
+                <li>{t('local.tshirt.d2')}</li>
+                <li>{t('local.tshirt.d3')}</li>
+              </ul>
+              <a
+                className="button primary"
+                href={TEMPORARY_RECRUITMENT_FORM_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('local.tshirt.cta')} <ArrowRight size={16} />
               </a>
             </article>
           </div>

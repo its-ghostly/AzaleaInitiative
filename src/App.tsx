@@ -52,7 +52,7 @@ function ComingSoonPanel() {
   )
 }
 
-type VolunteerPageId = 'why' | 'camp' | 'mooncake' | 'press' | 'cafe' | 'mayor' | 'debrief' | 'expand'
+type VolunteerPageId = 'why' | 'camp' | 'mooncake' | 'play' | 'press' | 'cafe' | 'mayor' | 'debrief' | 'expand'
 type VolunteerPageMeta = {
   id: VolunteerPageId
   art: string
@@ -95,13 +95,18 @@ const VOLUNTEER_JOURNALS: { year: number; pages: VolunteerPageMeta[] }[] = [
         detailCount: 3,
       },
       {
+        id: 'play',
+        art: 'garden',
+        videoUrl: WINTER_CLOSING_PLAY_VIDEO_URL,
+        detailCount: 3,
+      },
+      {
         id: 'press',
         art: 'press',
         articleUrl: 'https://hoomedia.com.tw/2025/07/02/76051/',
         articleSource: '互傳媒 Hoo Media',
-        videoUrl: WINTER_CLOSING_PLAY_VIDEO_URL,
         image: 'press/hoomedia-camping.jpg',
-        detailCount: 4,
+        detailCount: 3,
       },
       {
         id: 'expand',
@@ -145,7 +150,7 @@ function pagesForVolunteerYear(year: number): VolunteerPageMeta[] {
 }
 
 function volunteerPhotoCredit(id: VolunteerPageId): `volunteer.${VolunteerPageId}.credit` | 'volunteer.ourVolunteers' {
-  if (id === 'press' || id === 'mooncake' || id === 'cafe' || id === 'mayor' || id === 'debrief' || id === 'expand') {
+  if (id === 'press' || id === 'play' || id === 'mooncake' || id === 'cafe' || id === 'mayor' || id === 'debrief' || id === 'expand') {
     return `volunteer.${id}.credit`
   }
   return 'volunteer.ourVolunteers'

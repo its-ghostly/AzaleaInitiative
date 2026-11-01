@@ -24,13 +24,17 @@ import { LanguageSwitch, useLanguage } from './i18n/LanguageContext'
 import { asset } from './lib/asset'
 import { usePlatform } from './platform/usePlatform'
 
-/** Long-term team recruitment — Google Form (winter form stays off-site until advertised). */
+/** Long-term team recruitment — Google Form. */
 const LONG_TERM_RECRUITMENT_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLScUn7QCgsH57MzUQ4oP_T6OEyWCow7cKDR-w827PWBw-sTasQ/viewform'
 
 /** Temporary / short-window volunteering — Google Form. */
 const TEMPORARY_RECRUITMENT_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSdExRZcfmxhQAnSO51VaqlRvvwRJsyA1NdUj6ZV_5fTyAA3lQ/viewform'
+
+/** Winter Service Intensive interest — Google Form. */
+const WINTER_INTEREST_FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLSd4Yyz2sA9awdU6cQbN3-XH6qc4DfwRweGIURQheaNQJbIsAw/viewform'
 
 function ComingSoonPanel() {
   const { t } = useLanguage()
@@ -172,6 +176,9 @@ type CalendarEvent = {
   datesKey: string
   ctaKey: string
   href: string
+  secondaryCtaKey?: string
+  secondaryHref?: string
+  secondaryExternal?: boolean
 }
 
 const WINTER_PROGRAM_HASH = 'winter-program'
@@ -198,6 +205,9 @@ const AZALEA_EVENTS: CalendarEvent[] = [
     datesKey: 'events.winter.dates',
     ctaKey: 'events.winter.cta',
     href: WINTER_PROGRAM_HREF,
+    secondaryCtaKey: 'winter.ctaApply',
+    secondaryHref: WINTER_INTEREST_FORM_URL,
+    secondaryExternal: true,
   },
 ]
 
@@ -525,7 +535,15 @@ function App() {
             </div>
           </div>
           <div className="winter-actions">
-            <a className="button primary" href="?page=volunteer#volunteer-application">{t('winter.ctaJournal')} <Users size={17} /></a>
+            <a
+              className="button primary"
+              href={WINTER_INTEREST_FORM_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('winter.ctaApply')} <ArrowRight size={17} />
+            </a>
+            <a className="button ghost" href="?page=local">{t('winter.ctaJournal')} <Users size={17} /></a>
           </div>
         </section>
 
@@ -863,9 +881,22 @@ function App() {
                   <p className="event-dates">{t(event.datesKey)}</p>
                   <h3>{t(event.titleKey)}</h3>
                   <p>{t(event.bodyKey)}</p>
-                  <a className="button primary" href={event.href}>
-                    {t(event.ctaKey)} <ArrowRight size={16} />
-                  </a>
+                  <div className="event-card-actions">
+                    <a className="button primary" href={event.href}>
+                      {t(event.ctaKey)} <ArrowRight size={16} />
+                    </a>
+                    {event.secondaryCtaKey && event.secondaryHref ? (
+                      <a
+                        className="button ghost"
+                        href={event.secondaryHref}
+                        {...(event.secondaryExternal
+                          ? { target: '_blank', rel: 'noreferrer' }
+                          : {})}
+                      >
+                        {t(event.secondaryCtaKey)} <ArrowRight size={16} />
+                      </a>
+                    ) : null}
+                  </div>
                 </article>
               ))}
             </div>

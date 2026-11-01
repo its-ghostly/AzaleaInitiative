@@ -1,6 +1,6 @@
 # General Azalea recruitment — Google Forms
 
-Two public forms: **long-term** and **temporary / short-term**. Winter intensive stays in `docs/WINTER_INTEREST_FORM.md` and is not linked on the site yet.
+Two public forms: **long-term** and **temporary / short-term**. Winter intensive is separate — see `docs/WINTER_INTEREST_FORM.md`.
 
 **Notify (both):** Form owner account → Responses → Get email notifications
 

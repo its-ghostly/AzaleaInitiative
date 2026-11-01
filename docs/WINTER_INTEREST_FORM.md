@@ -1,12 +1,16 @@
-# Winter Service Intensive — Interest Form (held)
+# Winter Service Intensive — Interest Form
 
-**Status:** Keep offline. Do **not** link from the public site until leadership is ready to advertise the program.
+**Status:** Live on the public site (winter program CTAs).
 
-**Live Google Form URL (do not put on site yet):**  
+**Notify:** Form owner account (Responses → Get email notifications)
+
+**Live Google Form URL:**  
 https://docs.google.com/forms/d/e/1FAIpQLSd4Yyz2sA9awdU6cQbN3-XH6qc4DfwRweGIURQheaNQJbIsAw/viewform
 
 Clean share link:  
 https://docs.google.com/forms/d/e/1FAIpQLSd4Yyz2sA9awdU6cQbN3-XH6qc4DfwRweGIURQheaNQJbIsAw/viewform?usp=sf_link
+
+Wired in `src/App.tsx` as `WINTER_INTEREST_FORM_URL`.
 
 ---
 
@@ -33,7 +37,6 @@ https://docs.google.com/forms/d/e/1FAIpQLSd4Yyz2sA9awdU6cQbN3-XH6qc4DfwRweGIURQh
 | Families pay airfare; dorm/meals on site and included (Yes / may need aid, not guaranteed) | Yes |
 | Selective interest form, not acceptance | Yes |
 
-## When ready to advertise
+## Related forms
 
-1. Point winter CTAs on the site to the clean share link above  
-2. Keep the general volunteer Google Form separate  
+Keep the general volunteer Google Forms separate (`docs/GENERAL_RECRUITMENT_FORM.md`).

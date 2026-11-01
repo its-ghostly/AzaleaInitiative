@@ -282,7 +282,13 @@ nav .nav-volunteer svg { flex: 0 0 auto; }
 .winter-panels ul { margin: 0; padding-left: 1.1rem; color: #3d4640; line-height: 1.7; }
 .winter-panels li + li { margin-top: 8px; }
 .winter-panels p { margin: 0; color: #3d4640; line-height: 1.7; }
-.winter-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; }
+.winter-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 40px;
+}
 .winter-language-note {
   margin: 28px 0 0;
   max-width: 720px;
@@ -430,6 +436,12 @@ nav .nav-volunteer svg { flex: 0 0 auto; }
   margin: 0 0 12px;
 }
 .event-card > p { margin: 0 0 20px; color: #3d4640; line-height: 1.65; }
+.event-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
 
 .local-section {
   padding: 110px clamp(25px, 7vw, 110px) 100px;

@@ -2,14 +2,11 @@ import { useState } from 'react'
 import {
   ArrowDown,
   ArrowRight,
-  Brush,
   CalendarDays,
-  Check,
   Flower2,
   HandHeart,
   Heart,
   Home,
-  Mail,
   Megaphone,
   Menu,
   ShieldCheck,
@@ -22,8 +19,11 @@ import StaffWorkspace from './components/StaffWorkspace'
 import StatusTracker from './components/StatusTracker'
 import { LanguageSwitch, useLanguage } from './i18n/LanguageContext'
 import { asset } from './lib/asset'
-import { submitVolunteerApplication } from './platform/store'
 import { usePlatform } from './platform/usePlatform'
+
+/** General Azalea recruitment — Google Form (winter form stays off-site until advertised). */
+const GENERAL_RECRUITMENT_FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLScUn7QCgsH57MzUQ4oP_T6OEyWCow7cKDR-w827PWBw-sTasQ/viewform'
 
 function ComingSoonPanel() {
   const { t } = useLanguage()
@@ -32,7 +32,7 @@ function ComingSoonPanel() {
       <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
       <h2>{t('comingSoon.title')}</h2>
       <p>{t('comingSoon.body')}</p>
-      <a className="button ghost" href="./">{t('hero.ctaMission')}</a>
+      <a className="button ghost" href="./#winter-program">{t('hero.ctaProgram')}</a>
     </div>
   )
 }
@@ -157,7 +157,6 @@ function App() {
   const { user } = usePlatform()
   const isStaff = user?.kind === 'staff'
   const [menuOpen, setMenuOpen] = useState(false)
-  const [applicationSent, setApplicationSent] = useState(false)
   const [volunteerYear, setVolunteerYear] = useState(LATEST_VOLUNTEER_YEAR)
   const [volunteerPage, setVolunteerPage] = useState(0)
   const [flipDir, setFlipDir] = useState<'forward' | 'back'>('forward')
@@ -196,6 +195,7 @@ function App() {
             >
               <Home size={16} aria-hidden="true" /> {t('nav.home')}
             </a>
+            <a href="./#winter-program">{t('nav.winter')}</a>
             <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
             <a
               className="nav-volunteer"
@@ -225,8 +225,8 @@ function App() {
             <h1 dangerouslySetInnerHTML={{ __html: t('hero.title') }} />
             <p>{t('hero.body')}</p>
             <div className="hero-actions">
-              <span className="button primary coming-soon-cta" aria-disabled="true">{t('hero.ctaDraw')} <Brush size={18} /></span>
-              <a className="button text-link" href="#mission">{t('hero.ctaMission')} <ArrowDown size={18} /></a>
+              <a className="button primary" href="#winter-program">{t('hero.ctaProgram')} <ArrowRight size={18} /></a>
+              <a className="button text-link" href="?page=volunteer">{t('hero.ctaJournal')} <Users size={18} /></a>
             </div>
           </div>
           <div className="hero-art" aria-hidden="true">
@@ -256,6 +256,74 @@ function App() {
           <div className="scroll-note">{t('hero.scroll')} <ArrowDown size={15} /></div>
         </section>
 
+        <section className="winter-section" id="winter-program">
+          <div className="winter-intro">
+            <span className="eyebrow">{t('winter.eyebrow')}</span>
+            <h2 dangerouslySetInnerHTML={{ __html: t('winter.title') }} />
+            <p>{t('winter.body')}</p>
+            <p className="winter-selectivity">{t('winter.selectivity')}</p>
+            <a
+              className="press-link winter-partner-link"
+              href="http://www.hsiangyuan.org.tw/ap/index.aspx"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('winter.partnerLink')} <ArrowRight size={15} />
+            </a>
+          </div>
+          <div className="winter-grid">
+            <article>
+              <CalendarDays size={22} />
+              <h3>{t('winter.datesTitle')}</h3>
+              <p>{t('winter.datesBody')}</p>
+            </article>
+            <article>
+              <Users size={22} />
+              <h3>{t('winter.whoTitle')}</h3>
+              <p>{t('winter.whoBody')}</p>
+            </article>
+            <article>
+              <HandHeart size={22} />
+              <h3>{t('winter.serviceTitle')}</h3>
+              <p>{t('winter.serviceBody')}</p>
+            </article>
+            <article>
+              <Megaphone size={22} />
+              <h3>{t('winter.costTitle')}</h3>
+              <p>{t('winter.costBody')}</p>
+            </article>
+          </div>
+          <div className="winter-panels">
+            <div>
+              <h3>{t('winter.applyTitle')}</h3>
+              <ul>
+                <li>{t('winter.apply.1')}</li>
+                <li>{t('winter.apply.2')}</li>
+                <li>{t('winter.apply.3')}</li>
+                <li>{t('winter.apply.4')}</li>
+                <li>{t('winter.apply.5')}</li>
+              </ul>
+            </div>
+            <div>
+              <h3>{t('winter.parentsTitle')}</h3>
+              <ul>
+                <li>{t('winter.parents.1')}</li>
+                <li>{t('winter.parents.2')}</li>
+                <li>{t('winter.parents.3')}</li>
+                <li>{t('winter.parents.4')}</li>
+              </ul>
+            </div>
+            <div>
+              <h3>{t('winter.collegeTitle')}</h3>
+              <p>{t('winter.collegeBody')}</p>
+            </div>
+          </div>
+          <div className="winter-actions">
+            <a className="button primary" href="?page=volunteer">{t('winter.ctaJournal')} <Users size={17} /></a>
+          </div>
+          <p className="winter-language-note">{t('winter.languageNote')}</p>
+        </section>
+
         <section className="statement" id="mission">
           <span className="eyebrow centered">{t('mission.eyebrow')}</span>
           <h2 dangerouslySetInnerHTML={{ __html: t('mission.title') }} />
@@ -269,7 +337,7 @@ function App() {
             </article>
             <article>
               <span>02</span>
-              <Mail />
+              <HandHeart />
               <h3>{t('mission.v2.title')}</h3>
               <p>{t('mission.v2.body')}</p>
             </article>
@@ -282,71 +350,20 @@ function App() {
           </div>
         </section>
 
+        <section className="quiet-art-section" id="connect">
+          <p>{t('quietArt.body')}</p>
+          <span className="quiet-art-soon">{t('comingSoon.badge')}</span>
+        </section>
+
         <section className="draw-section" id="draw">
           <ComingSoonPanel />
         </section>
 
-        <section className="connect-section" id="connect">
-          <div className="section-heading">
-            <span className="eyebrow">{t('connect.eyebrow')}</span>
-            <h2 dangerouslySetInnerHTML={{ __html: t('connect.title') }} />
-          </div>
-          <div className="connection-grid">
-            <div className="connection-card coral coming-soon-card">
-              <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
-              <span className="card-number">01</span>
-              <span className="card-icon"><Brush /></span>
-              <span>
-                <strong>{t('connect.draw.title')}</strong>
-                <small>{t('connect.draw.body')}</small>
-              </span>
-            </div>
-            <div className="connection-card blue coming-soon-card">
-              <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
-              <span className="card-number">02</span>
-              <span className="card-icon"><Mail /></span>
-              <span>
-                <strong>{t('connect.thank.title')}</strong>
-                <small>{t('connect.thank.body')}</small>
-              </span>
-            </div>
-            <div className="connection-card gold coming-soon-card">
-              <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
-              <span className="card-number">03</span>
-              <span className="card-icon"><Sparkles /></span>
-              <span>
-                <strong>{t('connect.view.title')}</strong>
-                <small>{t('connect.view.body')}</small>
-              </span>
-            </div>
-          </div>
-          <div className="connect-volunteer-cta">
-            <p>{t('connect.volunteer.prompt')}</p>
-            <a className="button primary" href="?page=volunteer">
-              {t('connect.volunteer.cta')} <Users size={18} />
-            </a>
-          </div>
-        </section>
-
         <section className="message-section" id="message">
-          <div className="message-copy">
-            <span className="eyebrow">{t('message.eyebrow')}</span>
-            <h2 dangerouslySetInnerHTML={{ __html: t('message.title') }} />
-            <p>{t('comingSoon.body')}</p>
-          </div>
-          <div className="note-card">
-            <ComingSoonPanel />
-          </div>
+          <ComingSoonPanel />
         </section>
 
         <section className="gallery-section" id="gallery">
-          <div className="section-heading inline">
-            <div>
-              <span className="eyebrow">{t('gallery.eyebrow')}</span>
-              <h2 dangerouslySetInnerHTML={{ __html: t('gallery.title') }} />
-            </div>
-            <p>{t('gallery.body')}</p>
-          </div>
           <ComingSoonPanel />
         </section>
 
@@ -521,45 +538,17 @@ function App() {
                       <div className="join-doodle" aria-hidden="true"><Flower2 /><span dangerouslySetInnerHTML={{ __html: t('volunteer.apply.doodle') }} /></div>
                     </article>
                     <div className="sketch-page application-page">
-                      {applicationSent ? (
-                        <div className="application-success">
-                          <span><Check /></span>
-                          <div>
-                            <h3>{t('volunteer.apply.thanksTitle')}</h3>
-                            <p>{t('volunteer.apply.thanksBody')}</p>
-                          </div>
-                          <button className="text-button" onClick={() => setApplicationSent(false)}>{t('volunteer.apply.return')}</button>
-                        </div>
-                      ) : (
-                        <form
-                          onSubmit={async (event) => {
-                            event.preventDefault()
-                            const form = event.currentTarget
-                            const data = new FormData(form)
-                            try {
-                              const result = await submitVolunteerApplication({
-                                firstName: String(data.get('firstName') || ''),
-                                email: String(data.get('email') || ''),
-                                stage: String(data.get('stage') || ''),
-                                interest: String(data.get('interest') || ''),
-                                motivation: String(data.get('motivation') || ''),
-                              })
-                              setApplicationSent(true)
-                              form.reset()
-                              window.open(result.mailto, '_self')
-                            } catch (error) {
-                              alert(error instanceof Error ? error.message : t('volunteer.apply.error'))
-                            }
-                          }}
+                      <div className="application-external">
+                        <p>{t('volunteer.apply.formLead')}</p>
+                        <a
+                          className="button primary"
+                          href={GENERAL_RECRUITMENT_FORM_URL}
+                          target="_blank"
+                          rel="noreferrer"
                         >
-                          <label>{t('volunteer.apply.firstName')}<input required name="firstName" autoComplete="given-name" /></label>
-                          <label>{t('volunteer.apply.email')}<input required type="email" name="email" autoComplete="email" /></label>
-                          <label>{t('volunteer.apply.stage')}<select required name="stage" defaultValue=""><option value="" disabled>{t('volunteer.apply.select')}</option><option>{t('volunteer.apply.stage.hs')}</option><option>{t('volunteer.apply.stage.college')}</option><option>{t('volunteer.apply.stage.community')}</option></select></label>
-                          <label>{t('volunteer.apply.interest')}<select required name="interest" defaultValue=""><option value="" disabled>{t('volunteer.apply.select')}</option><option>{t('volunteer.apply.interest.fund')}</option><option>{t('volunteer.apply.interest.art')}</option><option>{t('volunteer.apply.interest.outreach')}</option><option>{t('volunteer.apply.interest.translation')}</option><option>{t('volunteer.apply.interest.web')}</option></select></label>
-                          <label className="wide">{t('volunteer.apply.why')}<textarea required name="motivation" maxLength={600} /></label>
-                          <button className="button primary" type="submit">{t('volunteer.apply.submit')} <ArrowRight size={17} /></button>
-                        </form>
-                      )}
+                          {t('volunteer.apply.submit')} <ArrowRight size={17} />
+                        </a>
+                      </div>
                     </div>
                   </>
                 ) : null}
@@ -660,8 +649,8 @@ function App() {
           </div>
         </div>
         <div className="footer-links">
-          <div><strong>{t('footer.explore')}</strong><a href="./#mission">{t('footer.mission')}</a><a href="?page=updates">{t('footer.updates')}</a><a href="./#current-mission">{t('footer.current')}</a></div>
-          <div><strong>{t('footer.involved')}</strong><a href="./#connect">{t('footer.art')}</a><a href="?page=volunteer">{t('footer.volunteer')}</a><a href="./#donate">{t('footer.donate')}</a></div>
+          <div><strong>{t('footer.explore')}</strong><a href="./#winter-program">{t('nav.winter')}</a><a href="./#mission">{t('footer.mission')}</a><a href="?page=updates">{t('footer.updates')}</a></div>
+          <div><strong>{t('footer.involved')}</strong><a href="?page=volunteer">{t('footer.volunteer')}</a><a href="./#connect">{t('footer.art')}</a><a href="./#donate">{t('footer.donate')}</a></div>
         </div>
         <div className="footer-bottom"><span>© 2026 Azalea Initiative</span><span>{t('footer.care')}</span></div>
       </footer>

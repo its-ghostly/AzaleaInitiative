@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ArrowDown,
   ArrowRight,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Flower2,
   HandHeart,
   Heart,
   Home,
+  Mail,
   Megaphone,
   Menu,
   ShieldCheck,
@@ -21,9 +24,13 @@ import { LanguageSwitch, useLanguage } from './i18n/LanguageContext'
 import { asset } from './lib/asset'
 import { usePlatform } from './platform/usePlatform'
 
-/** General Azalea recruitment — Google Form (winter form stays off-site until advertised). */
-const GENERAL_RECRUITMENT_FORM_URL =
+/** Long-term team recruitment — Google Form (winter form stays off-site until advertised). */
+const LONG_TERM_RECRUITMENT_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLScUn7QCgsH57MzUQ4oP_T6OEyWCow7cKDR-w827PWBw-sTasQ/viewform'
+
+/** Temporary / short-window volunteering — Google Form. */
+const TEMPORARY_RECRUITMENT_FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLSdExRZcfmxhQAnSO51VaqlRvvwRJsyA1NdUj6ZV_5fTyAA3lQ/viewform'
 
 function ComingSoonPanel() {
   const { t } = useLanguage()
@@ -32,7 +39,7 @@ function ComingSoonPanel() {
       <span className="coming-soon-badge">{t('comingSoon.badge')}</span>
       <h2>{t('comingSoon.title')}</h2>
       <p>{t('comingSoon.body')}</p>
-      <a className="button ghost" href="./#winter-program">{t('hero.ctaProgram')}</a>
+      <a className="button ghost" href={WINTER_PROGRAM_HREF}>{t('hero.ctaProgram')}</a>
     </div>
   )
 }
@@ -134,7 +141,7 @@ function volunteerPhotoCredit(id: VolunteerPageId): `volunteer.${VolunteerPageId
   return 'volunteer.ourVolunteers'
 }
 
-type SitePage = 'home' | 'draw' | 'thank' | 'view' | 'updates' | 'volunteer' | 'staff' | 'status'
+type SitePage = 'home' | 'draw' | 'thank' | 'view' | 'updates' | 'volunteer' | 'about' | 'events' | 'local' | 'contact' | 'staff' | 'status'
 
 function resolvePage(): SitePage {
   const requested = new URLSearchParams(window.location.search).get('page')
@@ -144,12 +151,161 @@ function resolvePage(): SitePage {
     || requested === 'view'
     || requested === 'updates'
     || requested === 'volunteer'
+    || requested === 'about'
+    || requested === 'events'
+    || requested === 'local'
+    || requested === 'contact'
     || requested === 'staff'
     || requested === 'status'
   ) {
     return requested
   }
   return 'home'
+}
+
+type CalendarEvent = {
+  id: string
+  start: string
+  end: string
+  titleKey: string
+  bodyKey: string
+  datesKey: string
+  ctaKey: string
+  href: string
+}
+
+const WINTER_PROGRAM_HASH = 'winter-program'
+const WINTER_PROGRAM_HREF = `./#${WINTER_PROGRAM_HASH}`
+
+/** Upcoming Azalea events (ISO dates, inclusive). */
+const AZALEA_EVENTS: CalendarEvent[] = [
+  {
+    id: 'camp-2026',
+    start: '2026-07-21',
+    end: '2026-07-23',
+    titleKey: 'events.camp.title',
+    bodyKey: 'events.camp.body',
+    datesKey: 'events.camp.dates',
+    ctaKey: 'events.camp.cta',
+    href: '?page=volunteer',
+  },
+  {
+    id: 'winter-2026',
+    start: '2026-12-23',
+    end: '2027-01-03',
+    titleKey: 'events.winter.title',
+    bodyKey: 'events.winter.body',
+    datesKey: 'events.winter.dates',
+    ctaKey: 'events.winter.cta',
+    href: WINTER_PROGRAM_HREF,
+  },
+]
+
+function dateKey(year: number, monthIndex: number, day: number) {
+  return `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+function isDateInEvent(isoDay: string, event: CalendarEvent) {
+  return isoDay >= event.start && isoDay <= event.end
+}
+
+function todayISO() {
+  const now = new Date()
+  return dateKey(now.getFullYear(), now.getMonth(), now.getDate())
+}
+
+/** Upcoming soonest-first, then past most-recent-first. */
+function sortEventsForDisplay(events: CalendarEvent[]) {
+  const today = todayISO()
+  const upcoming = events
+    .filter((event) => event.end >= today)
+    .sort((a, b) => a.start.localeCompare(b.start))
+  const past = events
+    .filter((event) => event.end < today)
+    .sort((a, b) => b.start.localeCompare(a.start))
+  return [...upcoming, ...past]
+}
+
+/** Browse month-by-month across the program year (includes Jan 2027 for the winter window). */
+const CALENDAR_MIN = { year: 2026, monthIndex: 0 }
+const CALENDAR_MAX = { year: 2027, monthIndex: 0 }
+const CALENDAR_START = { year: 2026, monthIndex: 11 }
+
+function monthCursorKey(year: number, monthIndex: number) {
+  return year * 12 + monthIndex
+}
+
+function MonthCalendar({
+  year,
+  monthIndex,
+  events,
+  weekdayLabels,
+  onPrev,
+  onNext,
+  canPrev,
+  canNext,
+}: {
+  year: number
+  monthIndex: number
+  events: CalendarEvent[]
+  weekdayLabels: string[]
+  onPrev: () => void
+  onNext: () => void
+  canPrev: boolean
+  canNext: boolean
+}) {
+  const { t, lang } = useLanguage()
+  const first = new Date(year, monthIndex, 1)
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
+  const startWeekday = first.getDay()
+  const monthLabel = first.toLocaleDateString(lang === 'en' ? 'en-US' : lang === 'zh-Hant' ? 'zh-Hant' : 'zh-Hans', {
+    month: 'long',
+    year: 'numeric',
+  })
+  const cells: Array<{ day: number | null; iso: string | null; event: CalendarEvent | null }> = []
+  for (let i = 0; i < startWeekday; i += 1) cells.push({ day: null, iso: null, event: null })
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const iso = dateKey(year, monthIndex, day)
+    const event = events.find((item) => isDateInEvent(iso, item)) ?? null
+    cells.push({ day, iso, event })
+  }
+
+  return (
+    <div className="month-calendar">
+      <div className="calendar-nav">
+        <button type="button" className="calendar-nav-btn" onClick={onPrev} disabled={!canPrev} aria-label={t('events.prevMonth')}>
+          <ChevronLeft size={18} aria-hidden="true" />
+        </button>
+        <h3>{monthLabel}</h3>
+        <button type="button" className="calendar-nav-btn" onClick={onNext} disabled={!canNext} aria-label={t('events.nextMonth')}>
+          <ChevronRight size={18} aria-hidden="true" />
+        </button>
+      </div>
+      <div className="calendar-weekdays" aria-hidden="true">
+        {weekdayLabels.map((label) => (
+          <span key={label}>{label}</span>
+        ))}
+      </div>
+      <div className="calendar-grid" role="grid" aria-label={monthLabel}>
+        {cells.map((cell, index) => (
+          <div
+            key={`${monthLabel}-${index}`}
+            role="gridcell"
+            className={[
+              'calendar-day',
+              cell.day ? '' : 'is-empty',
+              cell.event ? 'is-event' : '',
+              cell.iso === cell.event?.start ? 'is-start' : '',
+              cell.iso === cell.event?.end ? 'is-end' : '',
+            ].filter(Boolean).join(' ')}
+            title={cell.event ? t(cell.event.titleKey) : undefined}
+          >
+            {cell.day ?? ''}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function App() {
@@ -160,12 +316,42 @@ function App() {
   const [volunteerYear, setVolunteerYear] = useState(LATEST_VOLUNTEER_YEAR)
   const [volunteerPage, setVolunteerPage] = useState(0)
   const [flipDir, setFlipDir] = useState<'forward' | 'back'>('forward')
+  const [calendarCursor, setCalendarCursor] = useState(CALENDAR_START)
   const page = resolvePage()
+  const calendarCursorValue = monthCursorKey(calendarCursor.year, calendarCursor.monthIndex)
+  const canPrevMonth = calendarCursorValue > monthCursorKey(CALENDAR_MIN.year, CALENDAR_MIN.monthIndex)
+  const canNextMonth = calendarCursorValue < monthCursorKey(CALENDAR_MAX.year, CALENDAR_MAX.monthIndex)
+  const shiftCalendarMonth = (delta: number) => {
+    setCalendarCursor((current) => {
+      const next = new Date(current.year, current.monthIndex + delta, 1)
+      return { year: next.getFullYear(), monthIndex: next.getMonth() }
+    })
+  }
+  const weekdayLabels = [
+    t('events.weekday.0'),
+    t('events.weekday.1'),
+    t('events.weekday.2'),
+    t('events.weekday.3'),
+    t('events.weekday.4'),
+    t('events.weekday.5'),
+    t('events.weekday.6'),
+  ]
+  const sortedEvents = sortEventsForDisplay(AZALEA_EVENTS)
   const volunteerPages = pagesForVolunteerYear(volunteerYear)
   const isLatestJournal = volunteerYear === LATEST_VOLUNTEER_YEAR
   const volunteerPageCount = volunteerPages.length + (isLatestJournal ? 1 : 0)
   const activeVolunteer = volunteerPage < volunteerPages.length ? volunteerPages[volunteerPage] : null
   const showingJoin = isLatestJournal && volunteerPage === volunteerPages.length
+
+  useEffect(() => {
+    if (page !== 'home') return
+    const id = window.location.hash.replace(/^#/, '')
+    if (!id) return
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [page])
 
   const turnVolunteerPage = (next: number) => {
     setFlipDir(next > volunteerPage ? 'forward' : 'back')
@@ -195,7 +381,8 @@ function App() {
             >
               <Home size={16} aria-hidden="true" /> {t('nav.home')}
             </a>
-            <a href="./#winter-program">{t('nav.winter')}</a>
+            <a href="?page=about" aria-current={page === 'about' ? 'page' : undefined}>{t('nav.about')}</a>
+            <a href="?page=local" aria-current={page === 'local' ? 'page' : undefined}>{t('nav.local')}</a>
             <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
             <a
               className="nav-volunteer"
@@ -204,6 +391,8 @@ function App() {
             >
               {t('nav.volunteer')} <Users size={16} aria-hidden="true" />
             </a>
+            <a href="?page=contact" aria-current={page === 'contact' ? 'page' : undefined}>{t('nav.contact')}</a>
+            <a href="?page=events" aria-current={page === 'events' ? 'page' : undefined}>{t('nav.events')}</a>
             {isStaff ? (
               <a href="?page=staff" aria-current={page === 'staff' ? 'page' : undefined}>{t('nav.staff')}</a>
             ) : null}
@@ -225,7 +414,7 @@ function App() {
             <h1 dangerouslySetInnerHTML={{ __html: t('hero.title') }} />
             <p>{t('hero.body')}</p>
             <div className="hero-actions">
-              <a className="button primary" href="#winter-program">{t('hero.ctaProgram')} <ArrowRight size={18} /></a>
+              <a className="button primary" href={WINTER_PROGRAM_HREF}>{t('hero.ctaProgram')} <ArrowRight size={18} /></a>
               <a className="button text-link" href="?page=volunteer">{t('hero.ctaJournal')} <Users size={18} /></a>
             </div>
           </div>
@@ -313,15 +502,10 @@ function App() {
                 <li>{t('winter.parents.4')}</li>
               </ul>
             </div>
-            <div>
-              <h3>{t('winter.collegeTitle')}</h3>
-              <p>{t('winter.collegeBody')}</p>
-            </div>
           </div>
           <div className="winter-actions">
-            <a className="button primary" href="?page=volunteer">{t('winter.ctaJournal')} <Users size={17} /></a>
+            <a className="button primary" href="?page=volunteer#volunteer-application">{t('winter.ctaJournal')} <Users size={17} /></a>
           </div>
-          <p className="winter-language-note">{t('winter.languageNote')}</p>
         </section>
 
         <section className="statement" id="mission">
@@ -401,12 +585,6 @@ function App() {
         </section>
 
         <section className="volunteer-section" id="volunteers">
-          <div className="volunteer-florals" aria-hidden="true">
-            <img className="floral top-left" src={asset('florals/azalea-top-left.png')} alt="" />
-            <img className="floral top-right" src={asset('florals/azalea-top-right.png?v=2')} alt="" />
-            <img className="floral bottom-left" src={asset('florals/azalea-bottom-left.png')} alt="" />
-            <img className="floral bottom-right" src={asset('florals/azalea-bottom-right.png')} alt="" />
-          </div>
           <div className="volunteer-heading">
             <span className="eyebrow">{t('volunteer.eyebrow')}</span>
             <h2 dangerouslySetInnerHTML={{ __html: t('volunteer.title') }} />
@@ -542,11 +720,19 @@ function App() {
                         <p>{t('volunteer.apply.formLead')}</p>
                         <a
                           className="button primary"
-                          href={GENERAL_RECRUITMENT_FORM_URL}
+                          href={LONG_TERM_RECRUITMENT_FORM_URL}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {t('volunteer.apply.submit')} <ArrowRight size={17} />
+                          {t('volunteer.apply.submitLong')} <ArrowRight size={17} />
+                        </a>
+                        <a
+                          className="button ghost"
+                          href={TEMPORARY_RECRUITMENT_FORM_URL}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {t('volunteer.apply.submitTemp')} <ArrowRight size={17} />
                         </a>
                       </div>
                     </div>
@@ -626,10 +812,109 @@ function App() {
             <aside className="fund-status-note" aria-label="Donation status">
               <p className="fund-status-title">{t('donate.statusTitle')}</p>
               <p>{t('donate.statusBody')}</p>
-              <span className="button ghost small coming-soon-cta" aria-disabled="true">{t('donate.drawInstead')}</span>
+              <a className="button primary small" href={WINTER_PROGRAM_HREF}>{t('donate.winterCta')} <ArrowRight size={15} /></a>
             </aside>
           </div>
         </section>
+        <section className="events-section" id="events">
+          <div className="events-intro">
+            <span className="eyebrow">{t('events.eyebrow')}</span>
+            <h2 dangerouslySetInnerHTML={{ __html: t('events.title') }} />
+            <p>{t('events.body')}</p>
+          </div>
+          <div className="events-layout">
+            <div className="events-calendars" aria-label={t('events.calendarLabel')}>
+              <MonthCalendar
+                year={calendarCursor.year}
+                monthIndex={calendarCursor.monthIndex}
+                events={AZALEA_EVENTS}
+                weekdayLabels={weekdayLabels}
+                onPrev={() => shiftCalendarMonth(-1)}
+                onNext={() => shiftCalendarMonth(1)}
+                canPrev={canPrevMonth}
+                canNext={canNextMonth}
+              />
+            </div>
+            <div className="events-list">
+              {sortedEvents.map((event) => (
+                <article key={event.id} className="event-card">
+                  <CalendarDays size={22} aria-hidden="true" />
+                  <p className="event-dates">{t(event.datesKey)}</p>
+                  <h3>{t(event.titleKey)}</h3>
+                  <p>{t(event.bodyKey)}</p>
+                  <a className="button primary" href={event.href}>
+                    {t(event.ctaKey)} <ArrowRight size={16} />
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="local-section" id="local">
+          <div className="local-intro">
+            <span className="eyebrow">{t('local.eyebrow')}</span>
+            <h2 dangerouslySetInnerHTML={{ __html: t('local.title') }} />
+            <p>{t('local.body')}</p>
+          </div>
+          <div className="local-grid">
+            <article className="local-card featured">
+              <HandHeart size={22} aria-hidden="true" />
+              <p className="local-when">{t('local.learners.when')}</p>
+              <h3>{t('local.learners.title')}</h3>
+              <p>{t('local.learners.body')}</p>
+              <ul>
+                <li>{t('local.learners.d1')}</li>
+                <li>{t('local.learners.d2')}</li>
+                <li>{t('local.learners.d3')}</li>
+              </ul>
+              <a
+                className="button primary"
+                href={TEMPORARY_RECRUITMENT_FORM_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('local.learners.cta')} <ArrowRight size={16} />
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section className="contact-section" id="contact">
+          <div className="contact-intro">
+            <span className="eyebrow">{t('contact.eyebrow')}</span>
+            <h2 dangerouslySetInnerHTML={{ __html: t('contact.title') }} />
+            <p>{t('contact.body')}</p>
+          </div>
+          <div className="contact-grid">
+            <article className="contact-card preferred">
+              <Mail size={22} aria-hidden="true" />
+              <h3>{t('contact.emailPreferredTitle')}</h3>
+              <p>{t('contact.emailPreferredBody')}</p>
+              <a className="button primary" href="mailto:sjazaleainitiative@gmail.com">sjazaleainitiative@gmail.com</a>
+            </article>
+            <article className="contact-card">
+              <Mail size={22} aria-hidden="true" />
+              <h3>{t('contact.emailAltTitle')}</h3>
+              <p>{t('contact.emailAltBody')}</p>
+              <a className="button ghost" href="mailto:theazaleainiative@gmail.com">theazaleainiative@gmail.com</a>
+            </article>
+            <article className="contact-card">
+              <span className="ig-glyph contact-ig" aria-hidden="true" />
+              <h3>{t('contact.instagramTitle')}</h3>
+              <p>{t('contact.instagramBody')}</p>
+              <div className="contact-instagram-links">
+                <a href="https://www.instagram.com/theazaleainitiative/" target="_blank" rel="noreferrer">
+                  <span className="ig-glyph" aria-hidden="true" /> @theazaleainitiative
+                </a>
+                <a href="https://www.instagram.com/theazaleainitiative.sj/" target="_blank" rel="noreferrer">
+                  <span className="ig-glyph" aria-hidden="true" /> @theazaleainitiative.sj
+                </a>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <StatusTracker initialCode={new URLSearchParams(window.location.search).get('code') || ''} />
         <StaffWorkspace />
 
@@ -639,18 +924,10 @@ function App() {
         <div className="footer-brand">
           <a className="brand" href="./"><span className="brand-mark"><Flower2 /></span><span>Azalea <em>Initiative</em></span></a>
           <p>{t('footer.tagline')}</p>
-          <div className="footer-social" aria-label="Instagram">
-            <a href="https://www.instagram.com/theazaleainitiative/" target="_blank" rel="noreferrer">
-              <span className="ig-glyph" aria-hidden="true" /> @theazaleainitiative
-            </a>
-            <a href="https://www.instagram.com/theazaleainitiative.sj/" target="_blank" rel="noreferrer">
-              <span className="ig-glyph" aria-hidden="true" /> @theazaleainitiative.sj
-            </a>
-          </div>
         </div>
         <div className="footer-links">
-          <div><strong>{t('footer.explore')}</strong><a href="./#winter-program">{t('nav.winter')}</a><a href="./#mission">{t('footer.mission')}</a><a href="?page=updates">{t('footer.updates')}</a></div>
-          <div><strong>{t('footer.involved')}</strong><a href="?page=volunteer">{t('footer.volunteer')}</a><a href="./#connect">{t('footer.art')}</a><a href="./#donate">{t('footer.donate')}</a></div>
+          <div><strong>{t('footer.explore')}</strong><a href={WINTER_PROGRAM_HREF}>{t('hero.ctaProgram')}</a><a href="?page=events">{t('nav.events')}</a><a href="?page=about">{t('footer.mission')}</a></div>
+          <div><strong>{t('footer.involved')}</strong><a href="?page=local">{t('nav.local')}</a><a href="?page=volunteer">{t('footer.volunteer')}</a><a href="?page=contact">{t('nav.contact')}</a><a href="?page=about#donate">{t('footer.donate')}</a></div>
         </div>
         <div className="footer-bottom"><span>© 2026 Azalea Initiative</span><span>{t('footer.care')}</span></div>
       </footer>

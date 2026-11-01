@@ -25,27 +25,15 @@ Use this list in partner emails / calls. Do not publish answers until confirmed.
 - [ ] Emergency contacts and on-site medical procedures
 - [ ] What Azalea must bring (materials, gifts policy, costume/props for play)
 - [ ] Any certificate or service letter 香園 can issue
-- [ ] Whether Mandarin support from staff is available for US students
+- [ ] Basic on-site communication expectations for U.S. students (no college Mandarin course)
 
 **Duty of care reminder for all partner conversations:** Hsiang Yuan staff are partners in resident care. They are not a substitute for Azalea’s U.S. minor duty of care. Chaperone ratio stays Azalea’s responsibility (1:4–6; min. two unrelated adults).
 
-## Mandarin tutor (pursue carefully)
+## Mandarin / college language course
 
-**Public site status:** Exploring only — never “confirmed,” “included,” or “college credit.”
+**Status:** Dropped. Too intensive for this cohort plan. Do not pursue a college Mandarin course, tutoring credit, or TOCFL pathway.
 
-**Pursuit steps**
-
-1. Soft ask to college contact / Mandarin department for possible pre-trip tutoring or on-trip language buddy
-2. Clarify: volunteer vs paid; liability; schedule; whether any school note can be issued
-3. If yes, update `WINTER_PROGRAM_FACTS.md` and site copy in the same PR
-4. If no, keep exploring language; emphasize Mandarin is helpful but not required for applicants
-
-**Do not**
-
-- Promise TOCFL prep
-- Promise university credit
-- Require Mandarin fluency in applications
-- Name a tutor or school until they agree in writing
+**Public copy:** Mandarin is helpful but not required. Do not imply coursework, a tutor, or language credit.
 
 ## Sample partner email (English)
 

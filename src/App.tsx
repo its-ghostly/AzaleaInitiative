@@ -8,6 +8,7 @@ import {
   Flower2,
   HandHeart,
   Heart,
+  Home,
   Mail,
   Megaphone,
   Menu,
@@ -188,6 +189,13 @@ function App() {
             <span>Azalea <em>Initiative</em></span>
           </a>
           <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)} aria-label="Site pages">
+            <a
+              className="nav-home"
+              href="./"
+              aria-current={page === 'home' ? 'page' : undefined}
+            >
+              <Home size={16} aria-hidden="true" /> {t('nav.home')}
+            </a>
             <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
             <a
               className="nav-volunteer"

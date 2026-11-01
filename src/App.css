@@ -130,6 +130,7 @@ nav > a:not(.nav-cta) {
 }
 nav > a:not(.nav-cta):hover { color: var(--coral); border-color: var(--coral); background: white; }
 nav a[aria-current='page'] { color: #b14e78; border-color: rgba(177,78,120,.35); background: rgba(255,255,255,.82); text-decoration: none; }
+nav .nav-home svg,
 nav .nav-volunteer svg { flex: 0 0 auto; }
 .nav-link-button { cursor: pointer; font-size: inherit; font-weight: inherit; }
 .nav-cta { gap: 10px; }

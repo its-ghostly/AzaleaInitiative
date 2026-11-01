@@ -55,6 +55,7 @@ type VolunteerPageMeta = {
   art: string
   articleUrl?: string
   articleSource?: string
+  videoUrl?: string
   image?: string
   images?: string[]
   detailCount: number
@@ -95,8 +96,9 @@ const VOLUNTEER_JOURNALS: { year: number; pages: VolunteerPageMeta[] }[] = [
         art: 'press',
         articleUrl: 'https://hoomedia.com.tw/2025/07/02/76051/',
         articleSource: '互傳媒 Hoo Media',
+        videoUrl: 'https://www.youtube.com/watch?v=swkW36jNlY0',
         image: 'press/hoomedia-camping.jpg',
-        detailCount: 3,
+        detailCount: 4,
       },
       {
         id: 'expand',
@@ -685,10 +687,19 @@ function App() {
                             <li key={i}>{t(`volunteer.${activeVolunteer.id}.d${i + 1}`)}</li>
                           ))}
                         </ul>
-                        {activeVolunteer.articleUrl ? (
-                          <a className="press-link" href={activeVolunteer.articleUrl} target="_blank" rel="noreferrer">
-                            {t('volunteer.readStory')} {activeVolunteer.articleSource} <ArrowRight size={15} />
-                          </a>
+                        {(activeVolunteer.articleUrl || activeVolunteer.videoUrl) ? (
+                          <div className="story-links">
+                            {activeVolunteer.articleUrl ? (
+                              <a className="press-link" href={activeVolunteer.articleUrl} target="_blank" rel="noreferrer">
+                                {t('volunteer.readStory')} {activeVolunteer.articleSource} <ArrowRight size={15} />
+                              </a>
+                            ) : null}
+                            {activeVolunteer.videoUrl ? (
+                              <a className="press-link" href={activeVolunteer.videoUrl} target="_blank" rel="noreferrer">
+                                {t('volunteer.watchVideo')} <ArrowRight size={15} />
+                              </a>
+                            ) : null}
+                          </div>
                         ) : null}
                         <small>
                           {activeVolunteer.image || activeVolunteer.images?.length

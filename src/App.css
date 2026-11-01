@@ -104,29 +104,33 @@ em { font-family: 'Playfair Display', serif; font-weight: 500; }
 .eyebrow.light { color: #d7dfd3; }
 
 .site-header {
-  height: 78px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 clamp(24px, 5vw, 78px); position: absolute; top: 0; left: 0; right: 0;
+  height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding: 0 clamp(20px, 4vw, 56px); position: absolute; top: 0; left: 0; right: 0;
   z-index: 20; border-bottom: 1px solid rgba(41, 54, 46, .14);
   background: rgba(248, 245, 237, .78);
   backdrop-filter: blur(7px);
 }
-.brand { display: flex; gap: 11px; align-items: center; text-decoration: none; font-size: 21px; font-weight: 600; }
-.brand em { font-size: 20px; }
-.brand-mark { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--coral); color: white; }
-.brand-mark svg { width: 19px; }
-nav { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 500; }
+.header-primary { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.brand { display: flex; gap: 10px; align-items: center; text-decoration: none; font-size: 20px; font-weight: 600; min-width: 0; }
+.brand em { font-size: 19px; }
+.brand-mark { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--coral); color: white; flex: 0 0 auto; }
+.brand-mark svg { width: 18px; }
+.header-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; margin-left: auto; }
+nav {
+  display: flex; align-items: center; justify-content: flex-start; gap: 6px;
+  font-size: 14px; font-weight: 500; min-width: 0;
+}
 nav a { text-decoration: none; }
 nav a:not(.nav-cta), .nav-link-button { font-style: italic; }
 nav > a:not(.nav-cta) {
-  display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 14px;
-  border: 1px solid rgba(41,54,46,.28); border-radius: 999px; background: rgba(255,255,255,.52);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 32px; padding: 0 11px;
+  border: 1px solid rgba(41,54,46,.22); border-radius: 999px; background: rgba(255,255,255,.52);
+  white-space: nowrap;
 }
 nav > a:not(.nav-cta):hover { color: var(--coral); border-color: var(--coral); background: white; }
-nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-underline-offset: 5px; }
-.nav-home-group { display: flex; align-items: center; gap: 0; padding: 4px 6px; border: 1px solid rgba(41,54,46,.35); border-radius: 999px; background: rgba(255,255,255,.58); }
-.nav-home-group > a, .nav-home-group > button { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; padding: 0 13px; border: 0; background: transparent; border-radius: 0; white-space: nowrap; }
-.nav-home-group > * + * { border-left: 1px solid rgba(41,54,46,.18); }
-.nav-home-group > a:hover, .nav-home-group > button:hover { color: var(--coral); background: rgba(255,255,255,.75); }
+nav a[aria-current='page'] { color: #b14e78; border-color: rgba(177,78,120,.35); background: rgba(255,255,255,.82); text-decoration: none; }
+nav .nav-volunteer svg { flex: 0 0 auto; }
 .nav-link-button { cursor: pointer; font-size: inherit; font-weight: inherit; }
 .nav-cta { gap: 10px; }
 .nav-dropdown { position: relative; display: flex; align-items: stretch; }
@@ -160,7 +164,7 @@ nav a[aria-current='page'] { color: #b14e78; text-decoration: underline; text-un
 
 .hero-section {
   min-height: 740px; height: 100vh; max-height: 940px; display: grid; grid-template-columns: 46% 54%;
-  background: var(--cream); position: relative; overflow: hidden; padding-top: 78px;
+  background: var(--cream); position: relative; overflow: hidden; padding-top: 64px;
 }
 .hero-copy { padding: clamp(70px, 10vh, 120px) 20px 70px clamp(30px, 7vw, 110px); z-index: 2; position: relative; overflow: hidden; }
 .hero-copy h1 { font-size: clamp(64px, 6.25vw, 100px); line-height: .95; margin: 25px 0 38px; position: relative; }
@@ -854,17 +858,20 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
 
 @media (max-width: 1100px) {
   .menu-button { display: block; cursor: pointer; }
-  nav { display: none; position: absolute; top: 78px; left: 0; right: 0; background: #f8f5ed; padding: 25px; flex-direction: column; box-shadow: 0 20px 30px rgba(0,0,0,.1); }
+  .header-primary { flex: 1; min-width: 0; }
+  nav {
+    display: none; position: absolute; top: 64px; left: 0; right: 0;
+    background: #f8f5ed; padding: 18px 20px; flex-direction: column; align-items: stretch;
+    justify-content: flex-start; gap: 8px; box-shadow: 0 20px 30px rgba(0,0,0,.1);
+  }
   nav.open { display: flex; }
-  .nav-home-group { width: min(100%, 270px); flex-direction: column; gap: 0; border-radius: 20px; padding: 7px 10px; }
-  .nav-home-group > a, .nav-home-group > button, nav > a { min-width: 210px; }
-  .nav-home-group > * + * { border-left: 0; border-top: 1px solid rgba(41,54,46,.18); }
+  nav > a:not(.nav-cta) { min-width: 0; width: 100%; justify-content: flex-start; }
 }
 
 @media (max-width: 850px) {
-  .site-header { height: 68px; position: absolute; }
-  nav { top: 68px; }
-  .hero-section { height: auto; max-height: none; min-height: 0; grid-template-columns: 1fr; padding-top: 68px; }
+  .site-header { height: 60px; position: absolute; }
+  nav { top: 60px; }
+  .hero-section { height: auto; max-height: none; min-height: 0; grid-template-columns: 1fr; padding-top: 60px; }
   .hero-copy { padding: 70px 25px; }.hero-copy h1 { font-size: clamp(59px, 16vw, 82px); }.hero-actions { flex-wrap: wrap; }
   .hero-art { min-height: 600px; }.postcard { width: min(70vw, 420px); }.scroll-note { display: none; }
   .statement, .connect-section, .gallery-section { padding: 80px 22px; }
@@ -1106,7 +1113,6 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
 .queue-item .tag-id { background: transparent; padding: 0; }
 
 
-.header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .lang-switch {
   display: inline-flex; align-items: center; gap: 2px; padding: 3px;
   border: 1px solid rgba(41,54,46,.28); border-radius: 999px; background: rgba(255,255,255,.7);
@@ -1137,8 +1143,9 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
 }
 
 @media (max-width: 850px) {
-  .header-left { gap: 8px; }
+  .header-right { gap: 6px; }
   .lang-switch button { min-width: 30px; font-size: 11px; }
+  .brand span:last-child { font-size: 17px; }
 }
 
 

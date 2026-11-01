@@ -133,7 +133,6 @@ function volunteerPhotoCredit(id: VolunteerPageId): `volunteer.${VolunteerPageId
   return 'volunteer.ourVolunteers'
 }
 
-const CONNECT_PAGES = ['draw', 'thank', 'view'] as const
 type SitePage = 'home' | 'draw' | 'thank' | 'view' | 'updates' | 'volunteer' | 'staff' | 'status'
 
 function resolvePage(): SitePage {
@@ -162,7 +161,6 @@ function App() {
   const [volunteerPage, setVolunteerPage] = useState(0)
   const [flipDir, setFlipDir] = useState<'forward' | 'back'>('forward')
   const page = resolvePage()
-  const sendActive = CONNECT_PAGES.includes(page as typeof CONNECT_PAGES[number])
   const volunteerPages = pagesForVolunteerYear(volunteerYear)
   const isLatestJournal = volunteerYear === LATEST_VOLUNTEER_YEAR
   const volunteerPageCount = volunteerPages.length + (isLatestJournal ? 1 : 0)
@@ -184,30 +182,32 @@ function App() {
   return (
     <div className={`site-shell page-${page}`}>
       <header className="site-header">
-        <div className="header-left">
-          <LanguageSwitch />
-          <CommunityAccount />
+        <div className="header-primary">
           <a className="brand" href="./" aria-label="Azalea Initiative home">
             <span className="brand-mark"><Flower2 /></span>
             <span>Azalea <em>Initiative</em></span>
           </a>
-        </div>
-        <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"><Menu /></button>
-        <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)}>
-          <div className="nav-home-group" aria-label="Homepage sections">
-            <a href="./#mission">{t('nav.mission')}</a>
-            <a className={`nav-link-button nav-coming-soon${sendActive ? ' active' : ''}`} href="./#connect" aria-disabled="true">
-              {t('nav.send')} <span className="coming-soon-inline">{t('comingSoon.badge')}</span>
+          <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)} aria-label="Site pages">
+            <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
+            <a
+              className="nav-volunteer"
+              href="?page=volunteer"
+              aria-current={page === 'volunteer' ? 'page' : undefined}
+            >
+              {t('nav.volunteer')} <Users size={16} aria-hidden="true" />
             </a>
-            <a href="./#current-mission">{t('nav.current')}</a>
-            <a className="nav-cta" href="./#donate">{t('nav.donate')} <ArrowRight size={16} /></a>
-          </div>
-          <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
-          <a href="?page=volunteer" aria-current={page === 'volunteer' ? 'page' : undefined}>{t('nav.volunteer')}</a>
-          {isStaff ? (
-            <a href="?page=staff" aria-current={page === 'staff' ? 'page' : undefined}>{t('nav.staff')}</a>
-          ) : null}
-        </nav>
+            {isStaff ? (
+              <a href="?page=staff" aria-current={page === 'staff' ? 'page' : undefined}>{t('nav.staff')}</a>
+            ) : null}
+          </nav>
+        </div>
+        <div className="header-right">
+          <LanguageSwitch />
+          <CommunityAccount />
+          <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>
+            <Menu />
+          </button>
+        </div>
       </header>
 
       <main id="top">

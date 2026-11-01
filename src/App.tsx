@@ -37,6 +37,9 @@ const TEMPORARY_RECRUITMENT_FORM_URL =
 const WINTER_INTEREST_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSd4Yyz2sA9awdU6cQbN3-XH6qc4DfwRweGIURQheaNQJbIsAw/viewform'
 
+/** Summer 2025 closing play / service trip video. */
+const WINTER_CLOSING_PLAY_VIDEO_URL = 'https://www.youtube.com/watch?v=swkW36jNlY0'
+
 function ComingSoonPanel() {
   const { t } = useLanguage()
   return (
@@ -96,7 +99,7 @@ const VOLUNTEER_JOURNALS: { year: number; pages: VolunteerPageMeta[] }[] = [
         art: 'press',
         articleUrl: 'https://hoomedia.com.tw/2025/07/02/76051/',
         articleSource: '互傳媒 Hoo Media',
-        videoUrl: 'https://www.youtube.com/watch?v=swkW36jNlY0',
+        videoUrl: WINTER_CLOSING_PLAY_VIDEO_URL,
         image: 'press/hoomedia-camping.jpg',
         detailCount: 4,
       },
@@ -347,8 +350,19 @@ function App() {
   const { user } = usePlatform()
   const isStaff = user?.kind === 'staff'
   const [menuOpen, setMenuOpen] = useState(false)
-  const [volunteerYear, setVolunteerYear] = useState(LATEST_VOLUNTEER_YEAR)
-  const [volunteerPage, setVolunteerPage] = useState(0)
+  const [volunteerYear, setVolunteerYear] = useState(() => {
+    const year = Number(new URLSearchParams(window.location.search).get('year'))
+    return VOLUNTEER_JOURNALS.some((journal) => journal.year === year) ? year : LATEST_VOLUNTEER_YEAR
+  })
+  const [volunteerPage, setVolunteerPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    const year = Number(params.get('year'))
+    const story = params.get('story')
+    if (!story || !VOLUNTEER_JOURNALS.some((journal) => journal.year === year)) return 0
+    const pages = pagesForVolunteerYear(year)
+    const index = pages.findIndex((entry) => entry.id === story)
+    return index >= 0 ? index : 0
+  })
   const [flipDir, setFlipDir] = useState<'forward' | 'back'>('forward')
   const [calendarCursor, setCalendarCursor] = useState(calendarStartFromToday)
   const page = resolvePage()
@@ -485,14 +499,24 @@ function App() {
             <h2 dangerouslySetInnerHTML={{ __html: t('winter.title') }} />
             <p>{t('winter.body')}</p>
             <p className="winter-selectivity">{t('winter.selectivity')}</p>
-            <a
-              className="press-link winter-partner-link"
-              href="http://www.hsiangyuan.org.tw/ap/index.aspx"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t('winter.partnerLink')} <ArrowRight size={15} />
-            </a>
+            <div className="winter-intro-links">
+              <a
+                className="button primary small"
+                href={WINTER_CLOSING_PLAY_VIDEO_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('winter.watchPlay')} <ArrowRight size={15} />
+              </a>
+              <a
+                className="press-link winter-partner-link"
+                href="http://www.hsiangyuan.org.tw/ap/index.aspx"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('winter.partnerLink')} <ArrowRight size={15} />
+              </a>
+            </div>
           </div>
           <div className="winter-grid">
             <article>
@@ -682,25 +706,30 @@ function App() {
                         <span className="hand-label">{t(`volunteer.${activeVolunteer.id}.kicker`)}</span>
                         <h3>{t(`volunteer.${activeVolunteer.id}.title`)}</h3>
                         <p>{t(`volunteer.${activeVolunteer.id}.body`)}</p>
-                        <ul>
-                          {Array.from({ length: activeVolunteer.detailCount }, (_, i) => (
-                            <li key={i}>{t(`volunteer.${activeVolunteer.id}.d${i + 1}`)}</li>
-                          ))}
-                        </ul>
                         {(activeVolunteer.articleUrl || activeVolunteer.videoUrl) ? (
                           <div className="story-links">
+                            {activeVolunteer.videoUrl ? (
+                              <a
+                                className="button primary small"
+                                href={activeVolunteer.videoUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {t('volunteer.watchVideo')} <ArrowRight size={15} />
+                              </a>
+                            ) : null}
                             {activeVolunteer.articleUrl ? (
                               <a className="press-link" href={activeVolunteer.articleUrl} target="_blank" rel="noreferrer">
                                 {t('volunteer.readStory')} {activeVolunteer.articleSource} <ArrowRight size={15} />
                               </a>
                             ) : null}
-                            {activeVolunteer.videoUrl ? (
-                              <a className="press-link" href={activeVolunteer.videoUrl} target="_blank" rel="noreferrer">
-                                {t('volunteer.watchVideo')} <ArrowRight size={15} />
-                              </a>
-                            ) : null}
                           </div>
                         ) : null}
+                        <ul>
+                          {Array.from({ length: activeVolunteer.detailCount }, (_, i) => (
+                            <li key={i}>{t(`volunteer.${activeVolunteer.id}.d${i + 1}`)}</li>
+                          ))}
+                        </ul>
                         <small>
                           {activeVolunteer.image || activeVolunteer.images?.length
                             ? t('volunteer.fromNotes')

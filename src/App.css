@@ -253,7 +253,15 @@ nav .nav-volunteer svg { flex: 0 0 auto; }
   font-size: 16px;
   line-height: 1.65;
 }
-.winter-partner-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; }
+.winter-intro-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 22px;
+}
+.winter-partner-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 0; }
+.story-links .button { margin-top: 4px; }
 .winter-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

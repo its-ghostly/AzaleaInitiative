@@ -387,6 +387,12 @@ nav .nav-volunteer svg { flex: 0 0 auto; }
   border-radius: 10px;
 }
 .calendar-day.is-empty { visibility: hidden; }
+.calendar-day.is-today {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--coral);
+  background: transparent;
+  font-weight: 700;
+}
 .calendar-day.is-event {
   background: rgba(231, 117, 96, .16);
   color: #8a3f30;
@@ -395,6 +401,13 @@ nav .nav-volunteer svg { flex: 0 0 auto; }
 .calendar-day.is-end {
   background: var(--coral);
   color: white;
+}
+.calendar-day.is-today.is-event:not(.is-start):not(.is-end) {
+  background: rgba(231, 117, 96, .28);
+}
+.calendar-day.is-today.is-start,
+.calendar-day.is-today.is-end {
+  box-shadow: inset 0 0 0 2px #fff6fb;
 }
 .events-list { display: grid; gap: 18px; width: 100%; }
 .event-card {

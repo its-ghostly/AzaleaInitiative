@@ -229,10 +229,28 @@ function sortEventsForDisplay(events: CalendarEvent[]) {
 /** Browse month-by-month across the program year (includes Jan 2027 for the winter window). */
 const CALENDAR_MIN = { year: 2026, monthIndex: 0 }
 const CALENDAR_MAX = { year: 2027, monthIndex: 0 }
-const CALENDAR_START = { year: 2026, monthIndex: 11 }
 
 function monthCursorKey(year: number, monthIndex: number) {
   return year * 12 + monthIndex
+}
+
+function clampCalendarMonth(year: number, monthIndex: number) {
+  const value = monthCursorKey(year, monthIndex)
+  const min = monthCursorKey(CALENDAR_MIN.year, CALENDAR_MIN.monthIndex)
+  const max = monthCursorKey(CALENDAR_MAX.year, CALENDAR_MAX.monthIndex)
+  if (value < min) return { ...CALENDAR_MIN }
+  if (value > max) return { ...CALENDAR_MAX }
+  return { year, monthIndex }
+}
+
+function calendarStartFromToday() {
+  const today = new Date()
+  return clampCalendarMonth(today.getFullYear(), today.getMonth())
+}
+
+function todayDateKey() {
+  const today = new Date()
+  return dateKey(today.getFullYear(), today.getMonth(), today.getDate())
 }
 
 function MonthCalendar({
@@ -255,6 +273,7 @@ function MonthCalendar({
   canNext: boolean
 }) {
   const { t, lang } = useLanguage()
+  const todayIso = todayDateKey()
   const first = new Date(year, monthIndex, 1)
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
   const startWeekday = first.getDay()
@@ -297,8 +316,10 @@ function MonthCalendar({
               cell.event ? 'is-event' : '',
               cell.iso === cell.event?.start ? 'is-start' : '',
               cell.iso === cell.event?.end ? 'is-end' : '',
+              cell.iso === todayIso ? 'is-today' : '',
             ].filter(Boolean).join(' ')}
             title={cell.event ? t(cell.event.titleKey) : undefined}
+            aria-current={cell.iso === todayIso ? 'date' : undefined}
           >
             {cell.day ?? ''}
           </div>
@@ -316,7 +337,7 @@ function App() {
   const [volunteerYear, setVolunteerYear] = useState(LATEST_VOLUNTEER_YEAR)
   const [volunteerPage, setVolunteerPage] = useState(0)
   const [flipDir, setFlipDir] = useState<'forward' | 'back'>('forward')
-  const [calendarCursor, setCalendarCursor] = useState(CALENDAR_START)
+  const [calendarCursor, setCalendarCursor] = useState(calendarStartFromToday)
   const page = resolvePage()
   const calendarCursorValue = monthCursorKey(calendarCursor.year, calendarCursor.monthIndex)
   const canPrevMonth = calendarCursorValue > monthCursorKey(CALENDAR_MIN.year, CALENDAR_MIN.monthIndex)

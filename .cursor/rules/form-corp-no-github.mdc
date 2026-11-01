@@ -1,0 +1,28 @@
+---
+description: Absolute ban — never upload form-corp/ to GitHub
+alwaysApply: true
+---
+
+# form-corp must never reach GitHub
+
+**Absolute rule:** Nothing under `form-corp/` may be committed, pushed, force-added, or uploaded to GitHub (or any git remote).
+
+## Required checks on every repo update
+
+Before any `git add`, `git commit`, or `git push` that touches this repository:
+
+1. Run `bash scripts/verify-form-corp-not-on-github.sh` (or ensure it passes).
+2. Confirm `form-corp/` is listed in `.gitignore`.
+3. Confirm `git ls-files form-corp` is empty.
+4. Confirm no staged paths match `form-corp/**`.
+
+## Never do
+
+- `git add form-corp` / `git add -f form-corp/...`
+- Amend or commit that reintroduces `form-corp/` paths
+- Copy form-corp contents into tracked paths to “work around” the ban
+- Open a PR or push that contains `form-corp/` files
+
+## If the user asks to commit form-corp
+
+Refuse. Keep form-corp local only. Suggest private backups outside this public repo.

@@ -1,0 +1,25 @@
+name: Verify form-corp GitHub ban
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  form-corp-ban:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if form-corp is present in the tree
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E '^form-corp(/|$)'; then
+            echo "ERROR: form-corp/ paths are tracked. Remove them from git."
+            git ls-files | grep -E '^form-corp(/|$)' || true
+            exit 1
+          fi
+          if [ -d form-corp ] && [ -n "$(find form-corp -type f 2>/dev/null | head -1)" ]; then
+            # Checkout should not contain form-corp if ignored and never committed.
+            # If somehow present as leftover artifact, still fail CI for visibility.
+            echo "WARNING: form-corp directory exists in workspace; ensuring it is not tracked."
+          fi
+          bash scripts/verify-form-corp-not-on-github.sh

@@ -33,3 +33,6 @@ data/media/*
 !data/media/.gitkeep
 !data/.gitkeep
 .venv-i18n/
+
+# Absolute: never upload nonprofit formation materials to GitHub
+form-corp/

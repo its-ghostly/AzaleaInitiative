@@ -18,7 +18,6 @@ import {
   Users,
 } from 'lucide-react'
 import './App.css'
-import CommunityAccount from './components/CommunityAccount'
 import StaffWorkspace from './components/StaffWorkspace'
 import StatusTracker from './components/StatusTracker'
 import { LanguageSwitch, useLanguage } from './i18n/LanguageContext'
@@ -453,7 +452,6 @@ function App() {
         </div>
         <div className="header-right">
           <LanguageSwitch />
-          <CommunityAccount />
           <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu" aria-expanded={menuOpen}>
             <Menu />
           </button>

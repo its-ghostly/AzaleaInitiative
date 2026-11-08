@@ -433,9 +433,7 @@ function App() {
             >
               <Home size={16} aria-hidden="true" /> {t('nav.home')}
             </a>
-            <a href="?page=about" aria-current={page === 'about' ? 'page' : undefined}>{t('nav.about')}</a>
             <a href="?page=local" aria-current={page === 'local' ? 'page' : undefined}>{t('nav.local')}</a>
-            <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
             <a
               className="nav-volunteer"
               href="?page=volunteer"
@@ -443,6 +441,8 @@ function App() {
             >
               {t('nav.volunteer')} <Users size={16} aria-hidden="true" />
             </a>
+            <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
+            <a href="?page=about" aria-current={page === 'about' ? 'page' : undefined}>{t('nav.about')}</a>
             <a href="?page=contact" aria-current={page === 'contact' ? 'page' : undefined}>{t('nav.contact')}</a>
             <a href="?page=events" aria-current={page === 'events' ? 'page' : undefined}>{t('nav.events')}</a>
             {isStaff ? (
@@ -469,9 +469,9 @@ function App() {
               <a className="button text-link" href="?page=volunteer">{t('hero.ctaJournal')} <Users size={18} /></a>
             </div>
           </div>
-          <div className="hero-art" aria-hidden="true">
-            <div className="sun"></div>
-            <div className="azalea-sprig">
+          <div className="hero-art">
+            <div className="sun" aria-hidden="true"></div>
+            <div className="azalea-sprig" aria-hidden="true">
               <span className="azalea-leaf l1"></span>
               <span className="azalea-leaf l2"></span>
               <span className="azalea-bloom b1"><i></i></span>
@@ -479,19 +479,17 @@ function App() {
               <span className="azalea-bloom b3"><i></i></span>
             </div>
             <div className="postcard">
-              <span className="postcard-stamp"><Flower2 /></span>
+              <span className="postcard-stamp" aria-hidden="true"><Flower2 /></span>
               <div className="postcard-art">
-                <span className="hill back"></span>
-                <span className="hill front"></span>
-                <span className="paint-sun"></span>
-                <span className="flower f1">✿</span>
-                <span className="flower f2">✿</span>
-                <span className="flower f3">✿</span>
+                <img
+                  src={asset('press/hoomedia-camping.jpg')}
+                  alt={t('hero.photoAlt')}
+                />
               </div>
               <p>{t('hero.cardLine1')}<br /><em>{t('hero.cardLine2')}</em></p>
             </div>
-            <span className="scribble one">hello!</span>
-            <span className="scribble two">你好</span>
+            <span className="scribble one" aria-hidden="true">hello!</span>
+            <span className="scribble two" aria-hidden="true">你好</span>
           </div>
           <div className="scroll-note">{t('hero.scroll')} <ArrowDown size={15} /></div>
         </section>

@@ -216,18 +216,19 @@ nav .nav-volunteer svg { flex: 0 0 auto; }
 .azalea-leaf { position: absolute; width: 80px; height: 37px; background: #57785c; border-radius: 100% 5% 100% 5%; }
 .azalea-leaf.l1 { left: 4px; top: 23px; transform: rotate(28deg); }.azalea-leaf.l2 { right: 30px; bottom: 17px; transform: rotate(-23deg) scale(.8); }
 .postcard {
-  position: absolute; width: min(31vw, 465px); aspect-ratio: .79; background: #fffaf0; left: 50%; top: 51%;
-  transform: translate(-50%, -47%) rotate(3deg); padding: 31px; box-shadow: 0 25px 55px rgba(93,74,35,.19);
+  position: absolute; width: min(38vw, 540px); aspect-ratio: .82; background: #fffaf0; left: 50%; top: 51%;
+  transform: translate(-50%, -47%) rotate(3deg); padding: 26px; box-shadow: 0 25px 55px rgba(93,74,35,.19);
 }
 .postcard-stamp { display: grid; place-items: center; width: 50px; height: 57px; border: 2px dotted #c65e4a; color: #c65e4a; margin-left: auto; }
-.postcard-art { height: 58%; position: relative; overflow: hidden; margin-top: 15px; background: #f8dc89; }
-.hill { position: absolute; width: 120%; height: 55%; left: -10%; border-radius: 50% 50% 0 0; bottom: -20%; transform: rotate(4deg); }
-.hill.back { background: #88a88d; bottom: 8%; left: -40%; }
-.hill.front { background: #44644c; bottom: -16%; }
-.paint-sun { position: absolute; width: 64px; height: 64px; background: #e4775d; border-radius: 50%; top: 22%; left: 20%; }
-.flower { position: absolute; color: #f6c657; font-size: 32px; z-index: 3; }
-.f1 { left: 22%; bottom: 5%; }.f2 { left: 50%; bottom: 14%; color: #f4a58d; }.f3 { right: 15%; bottom: 2%; color: white; }
-.postcard p { margin: 18px 0 0; font-size: 23px; line-height: 1.25; }.postcard p em { color: var(--coral); }
+.postcard-art { height: 68%; position: relative; overflow: hidden; margin-top: 10px; background: #f0ebe0; }
+.postcard-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  display: block;
+}
+.postcard p { margin: 14px 0 0; font-size: 22px; line-height: 1.25; }.postcard p em { color: var(--coral); }
 .scribble { position: absolute; font-family: 'Playfair Display'; font-style: italic; font-size: 22px; transform: rotate(-12deg); }
 .scribble.one { left: 8%; top: 22%; }.scribble.two { right: 9%; bottom: 18%; transform: rotate(8deg); }
 .scroll-note { position: absolute; bottom: 27px; left: clamp(30px, 7vw, 110px); font-size: 14px; text-transform: uppercase; letter-spacing: .12em; display: flex; gap: 8px; align-items: center; }
@@ -1298,7 +1299,7 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
   nav { top: 60px; }
   .hero-section { height: auto; max-height: none; min-height: 0; grid-template-columns: 1fr; padding-top: 60px; }
   .hero-copy { padding: 70px 25px; }.hero-copy h1 { font-size: clamp(59px, 16vw, 82px); }.hero-actions { flex-wrap: wrap; }
-  .hero-art { min-height: 600px; }.postcard { width: min(70vw, 420px); }.scroll-note { display: none; }
+  .hero-art { min-height: 600px; }.postcard { width: min(78vw, 480px); }.scroll-note { display: none; }
   .statement, .connect-section, .gallery-section, .winter-section, .quiet-art-section { padding: 80px 22px; }
   .winter-grid { grid-template-columns: 1fr 1fr; }
   .winter-panels { grid-template-columns: 1fr; gap: 32px; }
@@ -1339,7 +1340,7 @@ footer { background: var(--cream); color: var(--ink); padding: 70px clamp(25px, 
 
 @media (max-width: 480px) {
   .winter-grid { grid-template-columns: 1fr; }
-  .postcard { width: 80vw; padding: 22px; }
+  .postcard { width: 86vw; padding: 20px; }
   .hero-art { min-height: 500px; }
   .statement h2, .section-heading h2, .message-copy h2, .gallery-section h2, .updates-heading h2, .volunteer-heading h2, .mission-intro h2, .donation-heading h2 { font-size: 42px; }
   .form-footer > span { display: none; }

@@ -51,7 +51,7 @@ function ComingSoonPanel() {
   )
 }
 
-type VolunteerPageId = 'why' | 'camp' | 'mooncake' | 'play' | 'press' | 'cafe' | 'mayor' | 'debrief' | 'expand'
+type VolunteerPageId = 'why' | 'camp' | 'mooncake' | 'play' | 'press' | 'trivia' | 'cafe' | 'bakery' | 'opera' | 'mayor' | 'debrief' | 'sjyouth' | 'expand'
 type VolunteerPageMeta = {
   id: VolunteerPageId
   art: string
@@ -97,6 +97,7 @@ const VOLUNTEER_JOURNALS: { year: number; pages: VolunteerPageMeta[] }[] = [
         id: 'play',
         art: 'garden',
         videoUrl: WINTER_CLOSING_PLAY_VIDEO_URL,
+        image: 'press/closing-play-2025.jpg',
         detailCount: 3,
       },
       {
@@ -105,6 +106,12 @@ const VOLUNTEER_JOURNALS: { year: number; pages: VolunteerPageMeta[] }[] = [
         articleUrl: 'https://hoomedia.com.tw/2025/07/02/76051/',
         articleSource: '互傳媒 Hoo Media',
         image: 'press/hoomedia-camping.jpg',
+        detailCount: 3,
+      },
+      {
+        id: 'sjyouth',
+        art: 'garden',
+        image: 'press/sj-youth-meeting-2025.jpg',
         detailCount: 3,
       },
       {
@@ -119,9 +126,31 @@ const VOLUNTEER_JOURNALS: { year: number; pages: VolunteerPageMeta[] }[] = [
     year: 2024,
     pages: [
       {
+        id: 'trivia',
+        art: 'garden',
+        images: [
+          'press/trivia-2024/flyer.jpg',
+          'press/trivia-2024/trivia-night.jpg',
+          'press/trivia-2024/gathering.jpg',
+        ],
+        detailCount: 3,
+      },
+      {
         id: 'cafe',
         art: 'cafe',
         image: 'press/cafe-transition.jpg',
+        detailCount: 3,
+      },
+      {
+        id: 'bakery',
+        art: 'garden',
+        image: 'press/hsiang-yuan-bakery-2024.jpg',
+        detailCount: 3,
+      },
+      {
+        id: 'opera',
+        art: 'garden',
+        image: 'press/opera-costumes-2024.jpg',
         detailCount: 3,
       },
       {
@@ -149,7 +178,7 @@ function pagesForVolunteerYear(year: number): VolunteerPageMeta[] {
 }
 
 function volunteerPhotoCredit(id: VolunteerPageId): `volunteer.${VolunteerPageId}.credit` | 'volunteer.ourVolunteers' {
-  if (id === 'press' || id === 'play' || id === 'mooncake' || id === 'cafe' || id === 'mayor' || id === 'debrief' || id === 'expand') {
+  if (id === 'press' || id === 'play' || id === 'mooncake' || id === 'trivia' || id === 'cafe' || id === 'bakery' || id === 'opera' || id === 'mayor' || id === 'debrief' || id === 'sjyouth' || id === 'expand') {
     return `volunteer.${id}.credit`
   }
   return 'volunteer.ourVolunteers'

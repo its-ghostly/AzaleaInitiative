@@ -184,7 +184,9 @@ function volunteerPhotoCredit(id: VolunteerPageId): `volunteer.${VolunteerPageId
   return 'volunteer.ourVolunteers'
 }
 
-type SitePage = 'home' | 'draw' | 'thank' | 'view' | 'updates' | 'volunteer' | 'about' | 'events' | 'local' | 'contact' | 'staff' | 'status'
+type SitePage = 'home' | 'draw' | 'thank' | 'view' | 'updates' | 'volunteer' | 'about' | 'events' | 'local' | 'contact' | 'board' | 'staff' | 'status'
+
+const BOARD_MEMBERS = ['anya', 'celine', 'mona', 'matthew', 'fred', 'lillian'] as const
 
 function resolvePage(): SitePage {
   const requested = new URLSearchParams(window.location.search).get('page')
@@ -198,6 +200,7 @@ function resolvePage(): SitePage {
     || requested === 'events'
     || requested === 'local'
     || requested === 'contact'
+    || requested === 'board'
     || requested === 'staff'
     || requested === 'status'
   ) {
@@ -472,6 +475,7 @@ function App() {
             </a>
             <a href="?page=updates" aria-current={page === 'updates' ? 'page' : undefined}>{t('nav.updates')}</a>
             <a href="?page=about" aria-current={page === 'about' ? 'page' : undefined}>{t('nav.about')}</a>
+            <a href="?page=board" aria-current={page === 'board' ? 'page' : undefined}>{t('nav.board')}</a>
             <a href="?page=contact" aria-current={page === 'contact' ? 'page' : undefined}>{t('nav.contact')}</a>
             <a href="?page=events" aria-current={page === 'events' ? 'page' : undefined}>{t('nav.events')}</a>
             {isStaff ? (
@@ -1057,6 +1061,23 @@ function App() {
           </div>
         </section>
 
+        <section className="board-bios-section" id="board">
+          <div className="board-bios-intro">
+            <span className="eyebrow">{t('board.eyebrow')}</span>
+            <h2 dangerouslySetInnerHTML={{ __html: t('board.title') }} />
+            <p>{t('board.body')}</p>
+          </div>
+          <div className="board-bios-grid">
+            {BOARD_MEMBERS.map((id) => (
+              <article key={id} className="board-bio">
+                <p className="board-bio-role">{t(`board.${id}.role`)}</p>
+                <h3>{t(`board.${id}.name`)}</h3>
+                <p>{t(`board.${id}.bio`)}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <StatusTracker initialCode={new URLSearchParams(window.location.search).get('code') || ''} />
         <StaffWorkspace />
 
@@ -1068,7 +1089,7 @@ function App() {
           <p>{t('footer.tagline')}</p>
         </div>
         <div className="footer-links">
-          <div><strong>{t('footer.explore')}</strong><a href={WINTER_PROGRAM_HREF}>{t('hero.ctaProgram')}</a><a href="?page=events">{t('nav.events')}</a><a href="?page=about">{t('footer.mission')}</a></div>
+          <div><strong>{t('footer.explore')}</strong><a href={WINTER_PROGRAM_HREF}>{t('hero.ctaProgram')}</a><a href="?page=events">{t('nav.events')}</a><a href="?page=about">{t('footer.mission')}</a><a href="?page=board">{t('nav.board')}</a></div>
           <div><strong>{t('footer.involved')}</strong><a href="?page=local">{t('nav.local')}</a><a href="?page=volunteer">{t('footer.volunteer')}</a><a href="?page=contact">{t('nav.contact')}</a><a href="?page=about#donate">{t('footer.donate')}</a></div>
         </div>
         <div className="footer-bottom"><span>© 2026 Azalea Initiative</span><span>{t('footer.care')}</span></div>
